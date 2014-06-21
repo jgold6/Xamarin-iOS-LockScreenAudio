@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LockScreenAudio", "LockScreenAudio\LockScreenAudio.csproj", "{91307622-90A6-41BB-8DB4-69E8DF17D767}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|iPhoneSimulator = Debug|iPhoneSimulator
+		Release|iPhoneSimulator = Release|iPhoneSimulator
+		Debug|iPhone = Debug|iPhone
+		Release|iPhone = Release|iPhone
+		Ad-Hoc|iPhone = Ad-Hoc|iPhone
+		AppStore|iPhone = AppStore|iPhone
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{91307622-90A6-41BB-8DB4-69E8DF17D767}.Ad-Hoc|iPhone.ActiveCfg = Ad-Hoc|iPhone
+		{91307622-90A6-41BB-8DB4-69E8DF17D767}.Ad-Hoc|iPhone.Build.0 = Ad-Hoc|iPhone
+		{91307622-90A6-41BB-8DB4-69E8DF17D767}.AppStore|iPhone.ActiveCfg = AppStore|iPhone
+		{91307622-90A6-41BB-8DB4-69E8DF17D767}.AppStore|iPhone.Build.0 = AppStore|iPhone
+		{91307622-90A6-41BB-8DB4-69E8DF17D767}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{91307622-90A6-41BB-8DB4-69E8DF17D767}.Debug|iPhone.Build.0 = Debug|iPhone
+		{91307622-90A6-41BB-8DB4-69E8DF17D767}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{91307622-90A6-41BB-8DB4-69E8DF17D767}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{91307622-90A6-41BB-8DB4-69E8DF17D767}.Release|iPhone.ActiveCfg = Release|iPhone
+		{91307622-90A6-41BB-8DB4-69E8DF17D767}.Release|iPhone.Build.0 = Release|iPhone
+		{91307622-90A6-41BB-8DB4-69E8DF17D767}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{91307622-90A6-41BB-8DB4-69E8DF17D767}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = LockScreenAudio\LockScreenAudio.csproj
+		Policies = $0
+		$0.VersionControlPolicy = $1
+		$1.inheritsSet = Mono
+	EndGlobalSection
+EndGlobal
