@@ -29,20 +29,25 @@ namespace LockScreenAudio
 				MPMediaItem[] albumSongs = album.Items;
 				string artistName = "";
 				songs = new List<Song>();
+				NSUrl assetUrl = null;
 				foreach (MPMediaItem songMediumItem in albumSongs) {
-					// Create a new song type and add the info from this song to it
-					Song song = new Song();
-					song.album = songMediumItem.AlbumTitle.ToString();
-					song.artist = songMediumItem.Artist.ToString();
-					if (artistName == "")
-						artistName = song.artist;
-					song.song = songMediumItem.Title.ToString();
-					song.songID = songMediumItem.PersistentID;
-					song.artwork = songMediumItem.Artwork;
-					// Add the song to the list
-					songs.Add(song);
+					assetUrl = songMediumItem.AssetURL;
+					if (assetUrl != null) {
+						// Create a new song type and add the info from this song to it
+						Song song = new Song();
+						song.album = songMediumItem.AlbumTitle.ToString();
+						song.artist = songMediumItem.Artist.ToString();
+						if (artistName == "")
+							artistName = song.artist;
+						song.song = songMediumItem.Title.ToString();
+						song.songID = songMediumItem.PersistentID;
+						song.artwork = songMediumItem.Artwork;
+						// Add the song to the list
+						songs.Add(song);
+					}
 				}
-				artistSongs.Add(artistName, songs);
+				if (assetUrl != null)
+					artistSongs.Add(artistName, songs);
 			}
 			return artistSongs;
 		}

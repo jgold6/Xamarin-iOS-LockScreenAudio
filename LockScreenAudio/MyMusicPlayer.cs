@@ -60,7 +60,6 @@ namespace LockScreenAudio
 			MusicQuery musicQuery = new MusicQuery();
 			MPMediaItem mediaItem = musicQuery.queryForSongWithId(songId);
 			if (mediaItem != null) {
-				NSUrl assetUrl = mediaItem.AssetURL;
 				var aSongs = Songs.artistSongs.Keys;
 				int index = 0;
 
@@ -73,15 +72,17 @@ namespace LockScreenAudio
 							foreach (Song song in songs) {
 								MPMediaItem mi = musicQuery.queryForSongWithId(song.songID);
 								if (mi != null) {
+									AVPlayerItem item = null;
 									NSUrl Url = mi.AssetURL;
-									AVPlayerItem item = AVPlayerItem.FromUrl(Url);
+									if (Url != null)
+										item = AVPlayerItem.FromUrl(Url);
 									if (item != null) {
 										this.avQueuePlayer.InsertItem(item, null);
 									}
-								}
-								if (mi == mediaItem) {
-									currentSongIndex = index;
-									SetNowPlayingInfo(song);
+									if (mi == mediaItem) {
+										currentSongIndex = index;
+										SetNowPlayingInfo(song);
+									}
 								}
 								index++;
 							}
@@ -118,7 +119,9 @@ namespace LockScreenAudio
 						MPMediaItem mi = musicQuery.queryForSongWithId(song.songID);
 						if (mi != null) {
 							NSUrl Url = mi.AssetURL;
-							AVPlayerItem item = AVPlayerItem.FromUrl(Url);
+							AVPlayerItem item =  null;
+							if (Url != null)
+								item = AVPlayerItem.FromUrl(Url);
 							if (item != null) {
 								this.avQueuePlayer.InsertItem(item, null);
 								if (index == currentSongIndex) {
