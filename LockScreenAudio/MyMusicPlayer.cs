@@ -18,6 +18,7 @@ namespace LockScreenAudio
 		List<Song> songs = new List<Song>();
 		int currentSongIndex = 0;
 		AVQueuePlayer avQueuePlayer = new AVQueuePlayer();
+		float SEEK_RATE = 10.0f;
 		#endregion
 
 		#region - Public properties
@@ -50,8 +51,6 @@ namespace LockScreenAudio
 			avSession.SetActive(true, out activationError);
 			if (activationError != null)
 				Console.WriteLine("Could not activate audio session {0}", activationError.LocalizedDescription);
-			avQueuePlayer.ActionAtItemEnd = AVPlayerActionAtItemEnd.Pause;
-
 		}
 		#endregion
 
@@ -151,46 +150,41 @@ namespace LockScreenAudio
 			}
 		}
 
+		// TODO: Handle song end event. As it is the next song plays if there is one, 
+		// but the data for the new song is not displayed.
+
 		// Handle control events from lock or control screen
 		public void RemoteControlReceived(UIEvent theEvent)
 		{
 			MPNowPlayingInfo np = new MPNowPlayingInfo();
 			if (theEvent.Subtype == UIEventSubtype.RemoteControlPause) {
-				Console.WriteLine("Received pause event");
 				this.avQueuePlayer.Pause();
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlPlay) {
-				Console.WriteLine("Received play event");
 				this.avQueuePlayer.Play();
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlPreviousTrack) {
-				Console.WriteLine("Received back event");
 				if (avQueuePlayer.CurrentTime.Seconds < dvc.song.duration - 1.0)
 					PreviousTrack();
 				else 
 					avQueuePlayer.Seek(CMTime.FromSeconds(0.0, 1));
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlNextTrack) {
-				Console.WriteLine("Received forward event");
 				NextTrack();
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlBeginSeekingForward) {
-				Console.WriteLine("Received seek forward event");
-				avQueuePlayer.Rate = 5.0f;
-				np.PlaybackRate = 5.0f;
+				avQueuePlayer.Rate = SEEK_RATE;
+				np.PlaybackRate = SEEK_RATE;
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlEndSeekingForward) {
-				Console.WriteLine("Received end seek forward event");
 				avQueuePlayer.Rate = 1.0f;
 				np.PlaybackRate = 1.0f;
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlBeginSeekingBackward) {
-				Console.WriteLine("Received seek backward event");
-				avQueuePlayer.Rate = -5.0f;
-				np.PlaybackRate = -5.0f;
+				avQueuePlayer.Rate = -SEEK_RATE;
+				np.PlaybackRate = -SEEK_RATE;
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlEndSeekingBackward) {
-				Console.WriteLine("Received end seek forward event");
 				avQueuePlayer.Rate = 1.0f;
 				np.PlaybackRate = 1.0f;
 			}
