@@ -47,6 +47,7 @@ namespace LockScreenAudio
 			base.ViewWillAppear(animated);
 			this.NavigationController.NavigationBar.BackgroundColor = UIColor.DarkGray;
 			this.NavigationController.NavigationBar.BarTintColor = UIColor.DarkGray;
+			this.NavigationController.NavigationBar.TintColor = UIColor.LightGray;
 		}
 
 		public override void ViewDidAppear(bool animated)
@@ -73,6 +74,7 @@ namespace LockScreenAudio
 			musicPlayer.dvc = null;
 			this.NavigationController.NavigationBar.BackgroundColor = UIColor.White;
 			this.NavigationController.NavigationBar.BarTintColor = UIColor.White;
+			this.NavigationController.NavigationBar.TintColor = UIColor.Blue;
 		}
 
 		public override bool CanBecomeFirstResponder

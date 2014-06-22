@@ -74,8 +74,7 @@ namespace LockScreenAudio
 								if (mi != null) {
 									AVPlayerItem item = null;
 									NSUrl Url = mi.AssetURL;
-									if (Url != null)
-										item = AVPlayerItem.FromUrl(Url);
+									item = AVPlayerItem.FromUrl(Url);
 									if (item != null) {
 										this.avQueuePlayer.InsertItem(item, null);
 									}
@@ -120,8 +119,7 @@ namespace LockScreenAudio
 						if (mi != null) {
 							NSUrl Url = mi.AssetURL;
 							AVPlayerItem item =  null;
-							if (Url != null)
-								item = AVPlayerItem.FromUrl(Url);
+							item = AVPlayerItem.FromUrl(Url);
 							if (item != null) {
 								this.avQueuePlayer.InsertItem(item, null);
 								if (index == currentSongIndex) {

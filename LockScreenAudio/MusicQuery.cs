@@ -19,6 +19,8 @@ namespace LockScreenAudio
 		public Dictionary<string, List<Song>> queryForSongs()
 		{
 			MPMediaQuery query = MPMediaQuery.artistsQuery;
+			MPMediaPropertyPredicate filter = MPMediaPropertyPredicate.PredicateWithValue(NSNumber.FromBoolean(false), MPMediaItem.IsCloudItemProperty);
+			query.AddFilterPredicate(filter);
 
 			MPMediaItemCollection[] songsByArtist = query.Collections;
 
@@ -29,25 +31,20 @@ namespace LockScreenAudio
 				MPMediaItem[] albumSongs = album.Items;
 				string artistName = "";
 				songs = new List<Song>();
-				NSUrl assetUrl = null;
 				foreach (MPMediaItem songMediumItem in albumSongs) {
-					assetUrl = songMediumItem.AssetURL;
-					if (assetUrl != null) {
-						// Create a new song type and add the info from this song to it
-						Song song = new Song();
-						song.album = songMediumItem.AlbumTitle.ToString();
-						song.artist = songMediumItem.Artist.ToString();
-						if (artistName == "")
-							artistName = song.artist;
-						song.song = songMediumItem.Title.ToString();
-						song.songID = songMediumItem.PersistentID;
-						song.artwork = songMediumItem.Artwork;
-						// Add the song to the list
-						songs.Add(song);
-					}
+					// Create a new song type and add the info from this song to it
+					Song song = new Song();
+					song.album = songMediumItem.AlbumTitle.ToString();
+					song.artist = songMediumItem.Artist.ToString();
+					if (artistName == "")
+						artistName = song.artist;
+					song.song = songMediumItem.Title.ToString();
+					song.songID = songMediumItem.PersistentID;
+					song.artwork = songMediumItem.Artwork;
+					// Add the song to the list
+					songs.Add(song);
 				}
-				if (assetUrl != null)
-					artistSongs.Add(artistName, songs);
+				artistSongs.Add(artistName, songs);
 			}
 			return artistSongs;
 		}
