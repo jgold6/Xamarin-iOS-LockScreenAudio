@@ -41,6 +41,8 @@ namespace LockScreenAudio
 					song.song = songMediumItem.Title.ToString();
 					song.songID = songMediumItem.PersistentID;
 					song.artwork = songMediumItem.Artwork;
+					song.duration = songMediumItem.PlaybackDuration;
+
 					// Add the song to the list
 					songs.Add(song);
 				}

@@ -50,6 +50,8 @@ namespace LockScreenAudio
 			avSession.SetActive(true, out activationError);
 			if (activationError != null)
 				Console.WriteLine("Could not activate audio session {0}", activationError.LocalizedDescription);
+			avQueuePlayer.ActionAtItemEnd = AVPlayerActionAtItemEnd.Pause;
+
 		}
 		#endregion
 
@@ -80,7 +82,8 @@ namespace LockScreenAudio
 									}
 									if (mi == mediaItem) {
 										currentSongIndex = index;
-										SetNowPlayingInfo(song);
+										MPNowPlayingInfo np = new MPNowPlayingInfo();
+										SetNowPlayingInfo(song, np);
 									}
 								}
 								index++;
@@ -124,7 +127,8 @@ namespace LockScreenAudio
 								this.avQueuePlayer.InsertItem(item, null);
 								if (index == currentSongIndex) {
 									dvc.song = song;
-									SetNowPlayingInfo(dvc.song);
+									MPNowPlayingInfo np = new MPNowPlayingInfo();
+									SetNowPlayingInfo(dvc.song, np);
 									dvc.DisplaySongInfo();
 								}
 							}
@@ -141,7 +145,8 @@ namespace LockScreenAudio
 				this.avQueuePlayer.AdvanceToNextItem();
 				currentSongIndex++;
 				dvc.song = songs[currentSongIndex];
-				SetNowPlayingInfo(dvc.song);
+				MPNowPlayingInfo np = new MPNowPlayingInfo();
+				SetNowPlayingInfo(dvc.song, np);
 				dvc.DisplaySongInfo();
 			}
 		}
@@ -149,6 +154,7 @@ namespace LockScreenAudio
 		// Handle control events from lock or control screen
 		public void RemoteControlReceived(UIEvent theEvent)
 		{
+			MPNowPlayingInfo np = new MPNowPlayingInfo();
 			if (theEvent.Subtype == UIEventSubtype.RemoteControlPause) {
 				Console.WriteLine("Received pause event");
 				this.avQueuePlayer.Pause();
@@ -159,12 +165,37 @@ namespace LockScreenAudio
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlPreviousTrack) {
 				Console.WriteLine("Received back event");
-				PreviousTrack();
+				if (avQueuePlayer.CurrentTime.Seconds < dvc.song.duration - 1.0)
+					PreviousTrack();
+				else 
+					avQueuePlayer.Seek(CMTime.FromSeconds(0.0, 1));
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlNextTrack) {
 				Console.WriteLine("Received forward event");
 				NextTrack();
 			}
+			else if (theEvent.Subtype == UIEventSubtype.RemoteControlBeginSeekingForward) {
+				Console.WriteLine("Received seek forward event");
+				avQueuePlayer.Rate = 5.0f;
+				np.PlaybackRate = 5.0f;
+			}
+			else if (theEvent.Subtype == UIEventSubtype.RemoteControlEndSeekingForward) {
+				Console.WriteLine("Received end seek forward event");
+				avQueuePlayer.Rate = 1.0f;
+				np.PlaybackRate = 1.0f;
+			}
+			else if (theEvent.Subtype == UIEventSubtype.RemoteControlBeginSeekingBackward) {
+				Console.WriteLine("Received seek backward event");
+				avQueuePlayer.Rate = -5.0f;
+				np.PlaybackRate = -5.0f;
+			}
+			else if (theEvent.Subtype == UIEventSubtype.RemoteControlEndSeekingBackward) {
+				Console.WriteLine("Received end seek forward event");
+				avQueuePlayer.Rate = 1.0f;
+				np.PlaybackRate = 1.0f;
+			}
+			np.ElapsedPlaybackTime = avQueuePlayer.CurrentTime.Seconds;
+			SetNowPlayingInfo(dvc.song, np);
 		}
 
 		public void clear()
@@ -174,15 +205,15 @@ namespace LockScreenAudio
 		#endregion
 
 		#region - Helper methods
-		void SetNowPlayingInfo(Song song)
+		void SetNowPlayingInfo(Song song, MPNowPlayingInfo np)
 		{
 			// Pass song info to the lockscreen/control screen
-			MPNowPlayingInfo np = new MPNowPlayingInfo();
 			np.AlbumTitle = song.album;
 			np.Artist = song.artist;
 			np.Title = song.song;
 			np.PersistentID = song.songID;
 			np.Artwork = song.artwork;
+			np.PlaybackDuration = song.duration;
 			MPNowPlayingInfoCenter.DefaultCenter.NowPlaying = np;
 		}
 		#endregion
