@@ -9,6 +9,7 @@ using MonoTouch.MediaPlayer;
 using MonoTouch.UIKit;
 using System.Collections.Generic;
 using MonoTouch.CoreMedia;
+using MonoTouch.CoreFoundation;
 
 namespace LockScreenAudio
 {
@@ -51,6 +52,22 @@ namespace LockScreenAudio
 			avSession.SetActive(true, out activationError);
 			if (activationError != null)
 				Console.WriteLine("Could not activate audio session {0}", activationError.LocalizedDescription);
+			avQueuePlayer.ActionAtItemEnd = AVPlayerActionAtItemEnd.None;
+			avQueuePlayer.AddPeriodicTimeObserver(CMTime.FromSeconds(5.0, 1), DispatchQueue.MainQueue, delegate(CMTime time) {
+				Console.WriteLine("Seconds: {0}, Value: {1}", time.Seconds, time.Value);
+
+				if (time.Seconds >= avQueuePlayer.CurrentItem.Duration.Seconds -1.0) {
+					NextTrack();
+				}
+				else if (avQueuePlayer.Rate > 1.0f && time.Seconds >= avQueuePlayer.CurrentItem.Duration.Seconds -6.0) {
+					avQueuePlayer.Rate = 1.0f;
+					NextTrack();
+				}
+				else if (avQueuePlayer.Rate < 0 && time.Seconds <= 6.0) {
+					avQueuePlayer.Rate = 1.0f;
+					PreviousTrack();
+				}
+			});
 		}
 		#endregion
 
@@ -127,6 +144,7 @@ namespace LockScreenAudio
 								if (index == currentSongIndex) {
 									dvc.song = song;
 									MPNowPlayingInfo np = new MPNowPlayingInfo();
+									np.PlaybackRate = 1.0f;
 									SetNowPlayingInfo(dvc.song, np);
 									dvc.DisplaySongInfo();
 								}
@@ -145,6 +163,7 @@ namespace LockScreenAudio
 				currentSongIndex++;
 				dvc.song = songs[currentSongIndex];
 				MPNowPlayingInfo np = new MPNowPlayingInfo();
+				np.PlaybackRate = 1.0f;
 				SetNowPlayingInfo(dvc.song, np);
 				dvc.DisplaySongInfo();
 			}
@@ -164,10 +183,7 @@ namespace LockScreenAudio
 				this.avQueuePlayer.Play();
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlPreviousTrack) {
-				if (avQueuePlayer.CurrentTime.Seconds < dvc.song.duration - 1.0)
-					PreviousTrack();
-				else 
-					avQueuePlayer.Seek(CMTime.FromSeconds(0.0, 1));
+				PreviousTrack();
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlNextTrack) {
 				NextTrack();
