@@ -96,9 +96,6 @@
   <ItemGroup>
     <None Include="Info.plist" />
     <None Include="Entitlements.plist" />
-    <None Include="..\README.md">
-      <Link>README.md</Link>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />

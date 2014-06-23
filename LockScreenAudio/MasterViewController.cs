@@ -82,24 +82,37 @@ namespace LockScreenAudio
 			return 0;
 		}
 
+		string[] alphabet = new string[]{"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+		string[] numbers = new string[]{"0","1","2","3","4","5","6","7","8","9"};
+
 		//Provide an index in the table for quick scrolling
 		public override string[] SectionIndexTitles(UITableView tableView)
 		{
 			List<string> index = new List<string>();
-			var artists = Songs.artistSongs.Keys.ToList().OrderBy(x => x.Substring(0,1));
+			var artists = Songs.artistSongs.Keys.ToList();
 			string lastChar = "";
 			foreach (string artist in artists) {
-				// Ignore artists that start with "The " and "A " and "'"
-				if ((artist.Length > 4 && artist.Substring(0,4) == "The ") || 
-					(artist.Length > 2 && artist.Substring(0,2) == "A ") || 
-					(artist.Length > 1 && artist.Substring(0,1) == "'"))
+				string initialLetter = "";
+				if (artist.Length > 4 && artist.Substring(0,4) == "The ") {
+					initialLetter = artist.Substring(4,1).ToUpper();
+				}
+				else if (artist.Length > 2 && artist.Substring(0,2) == "A ") {
+					initialLetter = artist.Substring(2,1).ToUpper();
+				}
+				else if (artist.Length >1)
+					initialLetter = artist.Substring(0,1).ToUpper();
+
+				// Ignore artists that start with non-alphabetic characters
+				if (artist.Length > 1 && !alphabet.Contains<string>(initialLetter)) {
 					continue;
+				}
 				// Add new initial letter to List
-				if (artist.Substring(0,1).ToUpper() != lastChar) {
-					lastChar = artist.Substring(0,1).ToUpper();
-					index.Add(lastChar);
+				if (initialLetter != lastChar) {
+					lastChar = initialLetter;
+					index.Add(initialLetter);
 				}
 			}
+			index.Add("#");
 			return index.ToArray();
 		}
 
@@ -108,16 +121,25 @@ namespace LockScreenAudio
 		{
 			var artists = Songs.artistSongs.Keys;
 			int section = 0;
+
 			foreach (string artist in artists) {
-				// Ignore artists that start with "The " and "A " and "'"
-				if ((artist.Length > 4 && artist.Substring(0,4) == "The ") || 
-					(artist.Length > 2 && artist.Substring(0,2) == "A ") || 
-					(artist.Length > 1 && artist.Substring(0,1) == "'")) {
+				string initialLetter = "";
+				if (artist.Length > 4 && artist.Substring(0,4) == "The ") {
+					initialLetter = artist.Substring(4,1).ToUpper();
+				}
+				else if (artist.Length > 2 && artist.Substring(0,2) == "A ") {
+					initialLetter = artist.Substring(2,1).ToUpper();
+				}
+				else if (artist.Length >1)
+					initialLetter = artist.Substring(0,1).ToUpper();
+
+				// Ignore non-alphanumeric characters
+				if (!alphabet.Contains<string>(initialLetter) && !numbers.Contains<string>(initialLetter)) {
 					section++;
 					continue;
 				}
-				// Is this the first artist with the initial letter equal to index letter (title parameter)? 
-				if (artist.Substring(0,1).ToUpper() == title)
+				// Is this the first artist with the initial letter equal to index letter (title parameter) or a number? 
+				if (initialLetter == title || numbers.Contains<string>(initialLetter))
 					return section;
 				else
 					section++;

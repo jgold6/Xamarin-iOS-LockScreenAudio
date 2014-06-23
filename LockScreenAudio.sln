@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LockScreenAudio", "LockScreenAudio\LockScreenAudio.csproj", "{91307622-90A6-41BB-8DB4-69E8DF17D767}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BCE2749B-9B14-4550-81BD-A2EFCB85ADDE}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|iPhoneSimulator = Debug|iPhoneSimulator
@@ -25,6 +30,8 @@ Global
 		{91307622-90A6-41BB-8DB4-69E8DF17D767}.Release|iPhone.Build.0 = Release|iPhone
 		{91307622-90A6-41BB-8DB4-69E8DF17D767}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
 		{91307622-90A6-41BB-8DB4-69E8DF17D767}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = LockScreenAudio\LockScreenAudio.csproj
