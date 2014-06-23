@@ -5,7 +5,7 @@ A sample Xamarin.iOS app that loads the music from the user's media library into
 
 This sample is loosely based on the Objective-C guide and sample I found at:
 http://www.sagorin.org/ios-playing-audio-in-background-audio/
-The obnjective-C sample app can be found at:
+The objective-C sample app can be found at:
 https://github.com/jsagorin/iOSBackgroundAudio
 
 This sample demonstrates using the MPMediaQuery (with filters), AVQueuePlayer, AVAudioSession, and the MPNowPlayingInfo API's. In addition it demonstrates setting up a quick scroll index when there are multiple sections for each index, in other words there are A-Z indexes but of course there may be multiple artists with the same first letter, so this shows how to implement the indexing in this scenario.
