@@ -102,6 +102,11 @@ namespace LockScreenAudio
 				else if (artist.Length >1)
 					initialLetter = artist.Substring(0,1).ToUpper();
 
+				// Handle numbers first
+				if (artist.Length > 1 && numbers.Contains<string>(initialLetter) && !index.Contains("#")) {
+					index.Add("#");
+					continue;
+				}
 				// Ignore artists that start with non-alphabetic characters
 				if (artist.Length > 1 && !alphabet.Contains<string>(initialLetter)) {
 					continue;
@@ -112,7 +117,6 @@ namespace LockScreenAudio
 					index.Add(initialLetter);
 				}
 			}
-			index.Add("#");
 			return index.ToArray();
 		}
 
