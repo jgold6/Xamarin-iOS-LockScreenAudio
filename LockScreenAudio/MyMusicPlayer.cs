@@ -215,11 +215,12 @@ namespace LockScreenAudio
 		public void clear()
 		{
 			this.avQueuePlayer.RemoveAllItems();
-			AVAudioSession avSession = AVAudioSession.SharedInstance();
-			NSError activationError = null;
-			avSession.SetActive(false, out activationError);
-			if (activationError != null)
-				Console.WriteLine("Could not activate audio session {0}", activationError.LocalizedDescription);
+			MPNowPlayingInfo np = new MPNowPlayingInfo();
+			np.Artist = "";
+			np.PlaybackDuration = null;
+			np.AlbumTitle = "";
+			np.Title = "";
+			MPNowPlayingInfoCenter.DefaultCenter.NowPlaying = np;
 		}
 		#endregion
 

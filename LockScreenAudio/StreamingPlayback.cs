@@ -3,12 +3,14 @@ using MonoTouch.AudioToolbox;
 using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
+using MonoTouch.Foundation;
 
 namespace LockScreenAudio
 {
 	/// <summary>
 	/// A Class to hold the AudioBuffer with all setting together
 	/// </summary>
+	[Preserve (AllMembers = true)] 
 	internal class AudioBuffer
 	{
 		public IntPtr Buffer { get; set; }
@@ -23,6 +25,7 @@ namespace LockScreenAudio
 	/// <summary>
 	/// Wrapper around OutputQueue and AudioFileStream to allow streaming of various filetypes
 	/// </summary>
+	[Preserve (AllMembers = true)] 
 	public class StreamingPlayback : IDisposable
 	{
 		public OutputAudioQueue OutputQueue;

@@ -242,7 +242,7 @@ namespace LockScreenAudio
 			song.artist = "brad stanfield";
 			song.duration = 300.0;
 			song.songID = 123;
-			var playerViewController = new PlayerViewController (PlayerOption.Stream, "http://ccmixter.org/content/bradstanfield/bradstanfield_-_People_Let_s_Stop_The_War.mp3");
+			var playerViewController = new PlayerViewController (PlayerOption.Stream, "http://johnnygold.com/music/croctears.mp3");
 			playerViewController.ErrorOccurred += HandleError;
 			NavigationController.PushViewController (playerViewController, true);
 

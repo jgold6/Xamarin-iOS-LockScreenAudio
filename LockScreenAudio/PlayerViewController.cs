@@ -11,6 +11,7 @@ using MonoTouch.AVFoundation;
 
 namespace LockScreenAudio
 {
+	[Preserve (AllMembers = true)] 
 	public partial class PlayerViewController : UIViewController
 	{
 		private NSTimer updatingTimer;
@@ -63,7 +64,6 @@ namespace LockScreenAudio
 			playPauseButton.TitleLabel.Text = "Pause";
 			timeLabel.Text = string.Empty; 
 
-//			AudioSession.Initialize ();
 			StartPlayback ();
 			IsPlaying = true;
 		}
@@ -81,11 +81,6 @@ namespace LockScreenAudio
 				player.FlushAndClose ();
 				player = null;
 			}
-			AVAudioSession avSession = AVAudioSession.SharedInstance();
-			NSError activationError = null;
-			avSession.SetActive(false, out activationError);
-			if (activationError != null)
-				Console.WriteLine("Could not activate audio session {0}", activationError.LocalizedDescription);
 		}
 
 		private void PlayPauseButtonClickHandler (object sender, EventArgs e)
@@ -106,7 +101,6 @@ namespace LockScreenAudio
 
 		private void StartPlayback ()
 		{
-//			PreparePlayback ();
 			try {
 				var request = (HttpWebRequest)WebRequest.Create (SourceUrl);
 				request.BeginGetResponse (StreamDownloadedHandler, request);
@@ -121,14 +115,6 @@ namespace LockScreenAudio
 				ErrorOccurred (message);
 		}
 
-//		private void PreparePlayback ()
-//		{
-//			//The following line prevents the audio from stopping when the device autolocks
-//			if (!UIDevice.CurrentDevice.CheckSystemVersion (7, 0)) {
-//				AudioSession.Category = AudioSessionCategory.MediaPlayback;
-//				AudioSession.RoutingOverride = AudioSessionRoutingOverride.Speaker;
-//			}
-//		}
 
 		private void StreamDownloadedHandler (IAsyncResult result)
 		{

@@ -2,9 +2,11 @@
 using System.Diagnostics;
 using System.Threading;
 using System.IO;
+using MonoTouch.Foundation;
 
 namespace LockScreenAudio
 {
+	[Preserve (AllMembers = true)] 
 	public class QueueStream : Stream
 	{
 		private Stream writeStream;
