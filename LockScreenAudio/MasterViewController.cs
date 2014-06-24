@@ -1,6 +1,8 @@
 ﻿// Loosely based on this guide: http://www.sagorin.org/ios-playing-audio-in-background-audio/
 // and sample in Obj-C: https://github.com/jsagorin/iOSBackgroundAudio
 
+// branch: streamaudio
+
 using System;
 using System.Drawing;
 using System.Collections.Generic;
