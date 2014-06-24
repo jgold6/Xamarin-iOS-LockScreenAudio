@@ -72,11 +72,11 @@ namespace LockScreenAudio
 			this.BecomeFirstResponder();
 
 			MPNowPlayingInfo np = new MPNowPlayingInfo();
-			np.AlbumTitle = "Johnny Walker";
-			np.Artist = "Johnny Gold";
-			np.Title = "Crocodile Tears";
-			np.PersistentID = 666;
-			np.PlaybackDuration = 231.0;
+			np.AlbumTitle = "brad stanfield";
+			np.Artist = "brad stanfield";
+			np.Title = "People Let's Stop the War";
+			np.PersistentID = 9475324612345678342;
+			np.PlaybackDuration = 300.0;
 			MPNowPlayingInfoCenter.DefaultCenter.NowPlaying = np;
 		}
 
