@@ -12,6 +12,7 @@ using MonoTouch.ObjCRuntime;
 
 namespace LockScreenAudio
 {
+	//TODO: Activity indicator for when streaming song is loading and progress bar for download. Can use the every 5 second listener to for updates. 
 	public partial class DetailViewController : UIViewController
 	{
 		#region - instance variables
