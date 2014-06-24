@@ -19,6 +19,7 @@ namespace LockScreenAudio
 		public Song song { get; set;} 
 		// The Music Player
 		public MyMusicPlayer musicPlayer {get; set;}
+
 		#endregion
 
 		#region - Constructors
@@ -70,11 +71,11 @@ namespace LockScreenAudio
 			// Unregister for control events
 			UIApplication.SharedApplication.EndReceivingRemoteControlEvents();
 			this.ResignFirstResponder();
-			// Clear the music players reference back to this class - avoid retain cycle
-			musicPlayer.dvc = null;
 			this.NavigationController.NavigationBar.BackgroundColor = UIColor.White;
 			this.NavigationController.NavigationBar.BarTintColor = UIColor.White;
 			this.NavigationController.NavigationBar.TintColor = UIColor.Blue;
+			// Clear the music players reference back to this class - avoid retain cycle
+			musicPlayer.dvc = null;
 		}
 
 		public override bool CanBecomeFirstResponder

@@ -10,10 +10,14 @@ using MonoTouch.UIKit;
 using System.Collections.Generic;
 using MonoTouch.CoreMedia;
 using MonoTouch.CoreFoundation;
+using System.Net;
+using System.IO;
+using MonoTouch.ObjCRuntime;
+using System.Diagnostics;
 
 namespace LockScreenAudio
 {
-	public class MyMusicPlayer
+	public class MyMusicPlayer : NSObject
 	{
 		#region - Private instance variables
 		List<Song> songs = new List<Song>();
@@ -26,7 +30,7 @@ namespace LockScreenAudio
 		public DetailViewController dvc { get; set;}
 		public float Rate { 
 			get {
-				return avQueuePlayer.Rate;
+				return avQueuePlayer.Rate;;
 			}
 			set {
 				avQueuePlayer.Rate = value;
@@ -211,6 +215,11 @@ namespace LockScreenAudio
 		public void clear()
 		{
 			this.avQueuePlayer.RemoveAllItems();
+			AVAudioSession avSession = AVAudioSession.SharedInstance();
+			NSError activationError = null;
+			avSession.SetActive(false, out activationError);
+			if (activationError != null)
+				Console.WriteLine("Could not activate audio session {0}", activationError.LocalizedDescription);
 		}
 		#endregion
 

@@ -11,9 +11,16 @@ using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using MonoTouch.MediaPlayer;
 using System.Linq;
+using MonoTouch.ObjCRuntime;
 
 namespace LockScreenAudio
 {
+	public enum PlayerOption
+	{
+		Stream = 0,
+		StreamAndSave
+	}
+
 	public partial class MasterViewController : UITableViewController
 	{
 		#region - Constructors
@@ -39,6 +46,10 @@ namespace LockScreenAudio
 			base.ViewDidLoad();
 			Songs.querySongs();
 			this.Title = String.Format("Songs ({0}) by Artist ({1})", Songs.songCount, Songs.artistCount);
+
+			UIBarButtonItem leftBBI = new UIBarButtonItem("Stream a song", UIBarButtonItemStyle.Bordered, this, new Selector("StreamSong:"));
+			this.NavigationItem.LeftBarButtonItem = leftBBI;
+
 			this.TableView.ReloadData();
 		}
 
@@ -47,13 +58,11 @@ namespace LockScreenAudio
 		{
 			// The segue to use
 			if (segue.Identifier == "showDetail") {
+				DetailViewController detailVC = segue.DestinationViewController as DetailViewController;
 				// Selected song
 				NSIndexPath indexPath = this.TableView.IndexPathForSelectedRow;
-
 				Song song = GetSong(indexPath);
-
 				// Pass song info to the detail view controller
-				DetailViewController detailVC = segue.DestinationViewController as DetailViewController;
 				detailVC.song = song;
 			}
 		}
@@ -223,6 +232,29 @@ namespace LockScreenAudio
 			}
 			return songs[indexPath.Row];
 		}
+
+		[Export("StreamSong:")]
+		public void StreamSong(UIBarButtonItem sender)
+		{
+			Song song = new Song();
+			song.song = "People Let's Stop the War";
+			song.album = "brad stanfield";
+			song.artist = "brad stanfield";
+			song.duration = 300.0;
+			song.songID = 123;
+			var playerViewController = new PlayerViewController (PlayerOption.Stream, "http://ccmixter.org/content/bradstanfield/bradstanfield_-_People_Let_s_Stop_The_War.mp3");
+			playerViewController.ErrorOccurred += HandleError;
+			NavigationController.PushViewController (playerViewController, true);
+
+		}
+
+		private void HandleError(string message)
+		{
+			InvokeOnMainThread (delegate {
+				this.Title = message;
+			});
+		}
+
 		#endregion
 	}
 }
