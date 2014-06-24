@@ -9,15 +9,15 @@ using System.Threading;
 using System.Diagnostics;
 using MonoTouch.AVFoundation;
 using MonoTouch.MediaPlayer;
+using MonoTouch.ObjCRuntime;
 
 namespace LockScreenAudio
 {
 	[Preserve (AllMembers = true)] 
 	public partial class PlayerViewController : UIViewController
 	{
-		private NSTimer updatingTimer;
-		private StreamingPlayback player;
-		public Action<string> ErrorOccurred;
+		private AVPlayerItem streamingItem;
+		private AVPlayer player;
 
 		public string SourceUrl { get; private set; }
 
@@ -37,7 +37,6 @@ namespace LockScreenAudio
 			avSession.SetActive(true, out activationError);
 			if (activationError != null)
 				Console.WriteLine("Could not activate audio session {0}", activationError.LocalizedDescription);
-			player = new StreamingPlayback ();
 
 		}
 
@@ -61,161 +60,63 @@ namespace LockScreenAudio
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
-			Title = PlayerOption == PlayerOption.Stream ? "Stream " : "Stream & Save";
+			playPauseButton.UserInteractionEnabled = false;
+			playPauseButton.TintColor = UIColor.LightGray;
+			// try different approach
+			NSUrl url = NSUrl.FromString("http://ccmixter.org/content/bradstanfield/bradstanfield_-_People_Let_s_Stop_The_War.mp3");
+			streamingItem = AVPlayerItem.FromUrl(url);
+			player = AVPlayer.FromPlayerItem(streamingItem);
+			streamingItem.AddObserver(this, new NSString("status"), NSKeyValueObservingOptions.Initial, player.Handle);
+			//NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("playerItemDidReachEnd:"), AVPlayerItem.DidPlayToEndTimeNotification, streamingItem);
+
+			Title = "Streaming";
 			playPauseButton.TitleLabel.Text = "Pause";
 			timeLabel.Text = string.Empty; 
 
-			StartPlayback ();
-			IsPlaying = true;
-
 			UIApplication.SharedApplication.BeginReceivingRemoteControlEvents();
 			this.BecomeFirstResponder();
-
-			MPNowPlayingInfo np = new MPNowPlayingInfo();
-			np.AlbumTitle = "brad stanfield";
-			np.Artist = "brad stanfield";
-			np.Title = "People Let's Stop the War";
-			np.PersistentID = 9475324612345678342;
-			np.PlaybackDuration = 300.0;
-			MPNowPlayingInfoCenter.DefaultCenter.NowPlaying = np;
+		}
+			
+		public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
+		{
+			Console.WriteLine("Status Observed Method {0}", player.Status);
+			if (player.Status == AVPlayerStatus.ReadyToPlay) {
+				playPauseButton.UserInteractionEnabled = true;
+				playPauseButton.TintColor = UIColor.Blue;
+				MPNowPlayingInfo np = new MPNowPlayingInfo();
+				np.AlbumTitle = "brad stanfield";
+				np.Artist = "brad stanfield";
+				np.Title = "People Let's Stop the War";
+				np.PlaybackDuration = streamingItem.Duration.Seconds;
+				MPNowPlayingInfoCenter.DefaultCenter.NowPlaying = np;
+				player.Play();
+			}
+			else if (player.Status == AVPlayerStatus.Failed) {
+				Title = "Stream Failed";
+			}
 		}
 
 		public override void ViewDidDisappear (bool animated)
 		{
 			base.ViewDidDisappear (animated);
-
-			if(updatingTimer != null)
-				updatingTimer.Invalidate ();
-
-			if (player != null) {
-				player.Reset();
-				player.ResetOutputQueue();
-				player.FlushAndClose ();
-				player = null;
-			}
+			player.Pause();
+			streamingItem.RemoveObserver(this, new NSString("status"));
+			player.Dispose();
 			UIApplication.SharedApplication.EndReceivingRemoteControlEvents();
 			this.ResignFirstResponder();
 		}
 
 		private void PlayPauseButtonClickHandler (object sender, EventArgs e)
 		{
-			if (player == null)
-				return;
-
-			if (IsPlaying)
-				player.Pause ();
-			else
-				player.Play ();
-
-			var title = IsPlaying ? "Play" : "Pause";
-			playPauseButton.SetTitle (title, UIControlState.Normal);
-			playPauseButton.SetTitle (title, UIControlState.Selected);
-			IsPlaying = !IsPlaying;
-		}
-
-		private void StartPlayback ()
-		{
-			try {
-				var request = (HttpWebRequest)WebRequest.Create (SourceUrl);
-				request.BeginGetResponse (StreamDownloadedHandler, request);
-			} catch (Exception e) {
-				string.Format ("Error: {0}", e.ToString ());
+			if (player.Rate > 0.0f) {
+				player.Pause();
+				playPauseButton.SetTitle("Play", UIControlState.Normal);
 			}
-		}
-
-		private void RaiseErrorOccurredEvent (string message)
-		{
-			if (ErrorOccurred != null)
-				ErrorOccurred (message);
-		}
-
-
-		private void StreamDownloadedHandler (IAsyncResult result)
-		{
-			var buffer = new byte [8192];
-			int l = 0;
-			int inputStreamLength;
-			double sampleRate = 0;
-
-			Stream inputStream;
-			AudioQueueTimeline timeline = null;
-
-			var request = result.AsyncState as HttpWebRequest;
-			try {
-				var response = request.EndGetResponse (result);
-				var responseStream = response.GetResponseStream ();
-
-				if (PlayerOption == PlayerOption.StreamAndSave)
-					inputStream = GetQueueStream (responseStream);
-				else
-					inputStream = responseStream;
-
-				player.OutputReady += delegate {
-					timeline = player.OutputQueue.CreateTimeline ();
-					sampleRate = player.OutputQueue.SampleRate;
-				};
-
-				InvokeOnMainThread (delegate {
-					if (updatingTimer != null)
-						updatingTimer.Invalidate ();
-
-					updatingTimer = NSTimer.CreateRepeatingScheduledTimer (0.5, () => RepeatingAction (timeline, sampleRate));
-				});
-
-				while ((inputStreamLength = inputStream.Read (buffer, 0, buffer.Length)) != 0 && player != null) {
-					l += inputStreamLength;
-					player.ParseBytes (buffer, inputStreamLength, false, l == (int)response.ContentLength);
-
-					InvokeOnMainThread (delegate {
-						progressBar.Progress = l / (float)response.ContentLength;
-					});
-				}
-
-
-			} catch (Exception e) {
-				RaiseErrorOccurredEvent ("Error fetching response stream\n" + e);
-				Debug.WriteLine (e);
-				InvokeOnMainThread (delegate {
-					if (NavigationController != null)
-						NavigationController.PopToRootViewController (true);
-				});
+			else 
+			{
+				player.Play();
+				playPauseButton.SetTitle("Pause", UIControlState.Normal);
 			}
-		}
-
-		private void RepeatingAction (AudioQueueTimeline timeline, double sampleRate)
-		{
-			var queue = player.OutputQueue;
-			if (queue == null || timeline == null)
-				return;
-
-			bool disc = false;
-			var time = new AudioTimeStamp ();
-			queue.GetCurrentTime (timeline, ref time, ref disc);
-
-			playbackTime.Text = FormatTime (time.SampleTime / sampleRate);
-		}
-
-		private string FormatTime (double time)
-		{
-			double minutes = time / 60;
-			double seconds = time % 60;
-
-			return String.Format ("{0}:{1:D2}", (int)minutes, (int)seconds);
-		}
-
-		private Stream GetQueueStream (Stream responseStream)
-		{
-			var queueStream = new QueueStream (Environment.GetFolderPath (Environment.SpecialFolder.Personal) + "/copy.mp3");
-			var t = new Thread ((x) => {
-				var tbuf = new byte [8192];
-				int count;
-
-				while ((count = responseStream.Read (tbuf, 0, tbuf.Length)) != 0)
-					queueStream.Push (tbuf, 0, count);
-
-			});
-			t.Start ();
-			return queueStream;
 		}
 
 		public override void RemoteControlReceived(UIEvent theEvent)
@@ -225,15 +126,11 @@ namespace LockScreenAudio
 			base.RemoteControlReceived(theEvent);
 			if (theEvent.Subtype == UIEventSubtype.RemoteControlPause) {
 				playPauseButton.SetTitle ("Play", UIControlState.Normal);
-				playPauseButton.SetTitle ("Play", UIControlState.Selected);
-				this.player.Pause();
-				IsPlaying = false;
+				player.Pause();
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlPlay) {
 				playPauseButton.SetTitle ("Pause", UIControlState.Normal);
-				playPauseButton.SetTitle ("Pause", UIControlState.Selected);
-				this.player.Play();
-				IsPlaying = true;
+				player.Play();
 			}
 		}
 	}

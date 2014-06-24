@@ -124,8 +124,6 @@
     <Compile Include="Songs.cs" />
     <Compile Include="MyMusicPlayer.cs" />
     <Compile Include="PlayerViewController.cs" />
-    <Compile Include="StreamingPlayback.cs" />
-    <Compile Include="QueueStream.cs" />
     <Compile Include="PlayerViewController.designer.cs">
       <DependentUpon>PlayerViewController.cs</DependentUpon>
     </Compile>
