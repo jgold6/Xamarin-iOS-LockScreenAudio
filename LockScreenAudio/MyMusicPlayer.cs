@@ -215,6 +215,7 @@ namespace LockScreenAudio
 		public void clear()
 		{
 			this.avQueuePlayer.RemoveAllItems();
+			this.avQueuePlayer.Init();
 			MPNowPlayingInfo np = new MPNowPlayingInfo();
 			np.Artist = "";
 			np.PlaybackDuration = null;

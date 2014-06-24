@@ -8,6 +8,7 @@ using System.IO;
 using System.Threading;
 using System.Diagnostics;
 using MonoTouch.AVFoundation;
+using MonoTouch.MediaPlayer;
 
 namespace LockScreenAudio
 {
@@ -66,6 +67,17 @@ namespace LockScreenAudio
 
 			StartPlayback ();
 			IsPlaying = true;
+
+			UIApplication.SharedApplication.BeginReceivingRemoteControlEvents();
+			this.BecomeFirstResponder();
+
+			MPNowPlayingInfo np = new MPNowPlayingInfo();
+			np.AlbumTitle = "Johnny Walker";
+			np.Artist = "Johnny Gold";
+			np.Title = "Crocodile Tears";
+			np.PersistentID = 666;
+			np.PlaybackDuration = 231.0;
+			MPNowPlayingInfoCenter.DefaultCenter.NowPlaying = np;
 		}
 
 		public override void ViewDidDisappear (bool animated)
@@ -81,6 +93,8 @@ namespace LockScreenAudio
 				player.FlushAndClose ();
 				player = null;
 			}
+			UIApplication.SharedApplication.EndReceivingRemoteControlEvents();
+			this.ResignFirstResponder();
 		}
 
 		private void PlayPauseButtonClickHandler (object sender, EventArgs e)
@@ -202,6 +216,25 @@ namespace LockScreenAudio
 			});
 			t.Start ();
 			return queueStream;
+		}
+
+		public override void RemoteControlReceived(UIEvent theEvent)
+		{
+			if (player == null)
+				return;
+			base.RemoteControlReceived(theEvent);
+			if (theEvent.Subtype == UIEventSubtype.RemoteControlPause) {
+				playPauseButton.SetTitle ("Play", UIControlState.Normal);
+				playPauseButton.SetTitle ("Play", UIControlState.Selected);
+				this.player.Pause();
+				IsPlaying = false;
+			}
+			else if (theEvent.Subtype == UIEventSubtype.RemoteControlPlay) {
+				playPauseButton.SetTitle ("Pause", UIControlState.Normal);
+				playPauseButton.SetTitle ("Pause", UIControlState.Selected);
+				this.player.Play();
+				IsPlaying = true;
+			}
 		}
 	}
 }
