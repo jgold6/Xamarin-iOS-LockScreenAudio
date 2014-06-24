@@ -31,7 +31,7 @@ namespace LockScreenAudio
 		public DetailViewController dvc { get; set;}
 		public float Rate { 
 			get {
-				return avQueuePlayer.Rate;;
+				return avQueuePlayer.Rate;
 			}
 			set {
 				avQueuePlayer.Rate = value;
@@ -246,15 +246,9 @@ namespace LockScreenAudio
 		public void cleanUp()
 		{
 			avQueuePlayer.RemoveAllItems();
-			avQueuePlayer.Init();
 			songs.Clear();
 			if (streamingItem != null)
-				streamingItem.Dispose();
-			MPNowPlayingInfo np = new MPNowPlayingInfo();
-			np.Artist = "";
-			np.AlbumTitle = "";
-			np.Title = "";
-			MPNowPlayingInfoCenter.DefaultCenter.NowPlaying = np;
+				streamingItem = null;
 		}
 		#endregion
 
