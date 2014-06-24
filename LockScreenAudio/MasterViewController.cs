@@ -23,6 +23,8 @@ namespace LockScreenAudio
 
 	public partial class MasterViewController : UITableViewController
 	{
+		UIBarButtonItem leftBBI;
+
 		#region - Constructors
 		public MasterViewController(IntPtr handle) : base(handle)
 		{
@@ -47,7 +49,7 @@ namespace LockScreenAudio
 			Songs.querySongs();
 			this.Title = String.Format("Songs ({0}) by Artist ({1})", Songs.songCount, Songs.artistCount);
 
-			UIBarButtonItem leftBBI = new UIBarButtonItem("Stream a song", UIBarButtonItemStyle.Bordered, this, new Selector("StreamSong:"));
+			leftBBI = new UIBarButtonItem("Stream a song", UIBarButtonItemStyle.Bordered, this, new Selector("StreamSong:"));
 			this.NavigationItem.LeftBarButtonItem = leftBBI;
 
 			this.TableView.ReloadData();
@@ -59,11 +61,25 @@ namespace LockScreenAudio
 			// The segue to use
 			if (segue.Identifier == "showDetail") {
 				DetailViewController detailVC = segue.DestinationViewController as DetailViewController;
-				// Selected song
-				NSIndexPath indexPath = this.TableView.IndexPathForSelectedRow;
-				Song song = GetSong(indexPath);
-				// Pass song info to the detail view controller
-				detailVC.song = song;
+				if (sender == leftBBI) {
+					Song song = new Song();
+					song.song = "People Let's Stop the War";
+					song.album = "brad stanfield";
+					song.artist = "brad stanfield";
+					song.duration = 300.0;
+					song.streamingURL = "http://ccmixter.org/content/bradstanfield/bradstanfield_-_People_Let_s_Stop_The_War.mp3";
+					// Pass song info to the detail view controller
+					detailVC.song = song;
+
+				}
+				else {
+					// Selected song
+					NSIndexPath indexPath = this.TableView.IndexPathForSelectedRow;
+					Song song = GetSong(indexPath);
+					song.streamingURL = null;
+					// Pass song info to the detail view controller
+					detailVC.song = song;
+				}
 			}
 		}
 
@@ -236,23 +252,7 @@ namespace LockScreenAudio
 		[Export("StreamSong:")]
 		public void StreamSong(UIBarButtonItem sender)
 		{
-			Song song = new Song();
-			song.song = "People Let's Stop the War";
-			song.album = "brad stanfield";
-			song.artist = "brad stanfield";
-			song.duration = 300.0;
-			song.songID = 123;
-			var playerViewController = new PlayerViewController (PlayerOption.Stream, "http://ccmixter.org/content/bradstanfield/bradstanfield_-_People_Let_s_Stop_The_War.mp3");
-			playerViewController.ErrorOccurred += HandleError;
-			NavigationController.PushViewController (playerViewController, true);
-
-		}
-
-		private void HandleError(string message)
-		{
-			InvokeOnMainThread (delegate {
-				this.Title = message;
-			});
+			PerformSegue("showDetail", sender);
 		}
 
 		#endregion

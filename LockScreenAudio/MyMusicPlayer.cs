@@ -24,6 +24,7 @@ namespace LockScreenAudio
 		int currentSongIndex = 0;
 		AVQueuePlayer avQueuePlayer = new AVQueuePlayer();
 		float SEEK_RATE = 10.0f;
+		private AVPlayerItem streamingItem;
 		#endregion
 
 		#region - Public properties
@@ -79,6 +80,7 @@ namespace LockScreenAudio
 		// Play song from persistentSongID
 		public void playSongWithId(ulong songId)
 		{
+			streamingItem = null;
 			MusicQuery musicQuery = new MusicQuery();
 			MPMediaItem mediaItem = musicQuery.queryForSongWithId(songId);
 			if (mediaItem != null) {
@@ -119,6 +121,35 @@ namespace LockScreenAudio
 			}
 		}
 
+		public void playStreamingSong (Song song)
+		{
+			songs.Clear();
+			songs.Add(song);
+			currentSongIndex = 0;
+			// try different approach
+			NSUrl nsUrl = NSUrl.FromString(song.streamingURL);
+			streamingItem = AVPlayerItem.FromUrl(nsUrl);
+			avQueuePlayer.InsertItem(streamingItem, null);
+			streamingItem.AddObserver(this, new NSString("status"), NSKeyValueObservingOptions.New, avQueuePlayer.Handle);
+			//NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("playerItemDidReachEnd:"), AVPlayerItem.DidPlayToEndTimeNotification, streamingItem);
+		}
+
+		public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
+		{
+			Console.WriteLine("Status Observed Method {0}", avQueuePlayer.Status);
+			if (avQueuePlayer.Status == AVPlayerStatus.ReadyToPlay) {
+				dvc.enablePlayPauseButton();
+
+				songs[currentSongIndex].duration = streamingItem.Duration.Seconds;
+				MPNowPlayingInfo np = new MPNowPlayingInfo();
+				SetNowPlayingInfo(songs[currentSongIndex], np);
+				this.play();
+			}
+			else if (avQueuePlayer.Status == AVPlayerStatus.Failed) {
+				Console.WriteLine("Stream Failed");
+			}
+		}
+
 		public void pause()
 		{
 			this.avQueuePlayer.Pause();
@@ -133,7 +164,7 @@ namespace LockScreenAudio
 		{
 			if (currentSongIndex > 0) {
 				currentSongIndex--;
-				clear();
+				avQueuePlayer.RemoveAllItems();
 				int index = 0;
 				foreach (Song song in songs) {
 					if (index>=currentSongIndex) {
@@ -212,13 +243,15 @@ namespace LockScreenAudio
 			SetNowPlayingInfo(dvc.song, np);
 		}
 
-		public void clear()
+		public void cleanUp()
 		{
-			this.avQueuePlayer.RemoveAllItems();
-			this.avQueuePlayer.Init();
+			avQueuePlayer.RemoveAllItems();
+			avQueuePlayer.Init();
+			songs.Clear();
+			if (streamingItem != null)
+				streamingItem.Dispose();
 			MPNowPlayingInfo np = new MPNowPlayingInfo();
 			np.Artist = "";
-			np.PlaybackDuration = null;
 			np.AlbumTitle = "";
 			np.Title = "";
 			MPNowPlayingInfoCenter.DefaultCenter.NowPlaying = np;
@@ -232,8 +265,10 @@ namespace LockScreenAudio
 			np.AlbumTitle = song.album;
 			np.Artist = song.artist;
 			np.Title = song.song;
-			np.PersistentID = song.songID;
-			np.Artwork = song.artwork;
+			if (streamingItem != null)
+				np.PersistentID = song.songID;
+			if (song.artwork != null)
+				np.Artwork = song.artwork;
 			np.PlaybackDuration = song.duration;
 			MPNowPlayingInfoCenter.DefaultCenter.NowPlaying = np;
 		}

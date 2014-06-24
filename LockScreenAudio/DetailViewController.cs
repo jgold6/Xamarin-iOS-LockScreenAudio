@@ -57,7 +57,24 @@ namespace LockScreenAudio
 			// Create and initialize music player
 			musicPlayer = new MyMusicPlayer(this);
 			// Play song (and load all songs by artist to player queue)
-			musicPlayer.playSongWithId(song.songID);
+			if (song.streamingURL == null) {
+				musicPlayer.playSongWithId(song.songID);
+				prevBtn.UserInteractionEnabled = true;
+				prevBtn.TintColor = UIColor.Blue;
+				nextBtn.UserInteractionEnabled = true;
+				nextBtn.TintColor = UIColor.Blue;
+				playPause.UserInteractionEnabled = true;
+				playPause.TintColor = UIColor.Blue;
+			}
+			else {
+				musicPlayer.playStreamingSong(song);
+				prevBtn.UserInteractionEnabled = false;
+				prevBtn.TintColor = UIColor.DarkGray;
+				nextBtn.UserInteractionEnabled = false;
+				nextBtn.TintColor = UIColor.DarkGray;
+				playPause.UserInteractionEnabled = false;
+				playPause.TintColor = UIColor.DarkGray;
+			}
 			// Register for receiving controls from lock screen and controlscreen
 			UIApplication.SharedApplication.BeginReceivingRemoteControlEvents();
 			this.BecomeFirstResponder();
@@ -67,7 +84,7 @@ namespace LockScreenAudio
 		{
 			base.ViewWillDisappear(animated);
 			// Clear the music player
-			musicPlayer.clear();
+			musicPlayer.cleanUp();
 			// Unregister for control events
 			UIApplication.SharedApplication.EndReceivingRemoteControlEvents();
 			this.ResignFirstResponder();
@@ -147,9 +164,17 @@ namespace LockScreenAudio
 			artistNameLabel.Text = song.artist;
 			albumNameLabel.Text = song.album;
 			songTitleLabel.Text = song.song;
-			songIdLabel.Text = song.songID.ToString();
-			artworkView.Image = song.artwork.ImageWithSize(new SizeF(115.0f, 115.0f));
+			songIdLabel.Text = song.streamingURL == null ? song.songID.ToString() : song.streamingURL;
+			if (song.artwork != null)
+				artworkView.Image = song.artwork.ImageWithSize(new SizeF(115.0f, 115.0f));
 		}
+
+		public void enablePlayPauseButton()
+		{
+			playPause.UserInteractionEnabled = true;
+			playPause.TintColor = UIColor.Blue;
+		}
+
 		#endregion
 	}
 }

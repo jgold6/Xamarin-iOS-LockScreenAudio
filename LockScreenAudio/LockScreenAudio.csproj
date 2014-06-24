@@ -123,15 +123,10 @@
     <Compile Include="Song.cs" />
     <Compile Include="Songs.cs" />
     <Compile Include="MyMusicPlayer.cs" />
-    <Compile Include="PlayerViewController.cs" />
-    <Compile Include="PlayerViewController.designer.cs">
-      <DependentUpon>PlayerViewController.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <InterfaceDefinition Include="MainStoryboard.storyboard" />
-    <InterfaceDefinition Include="PlayerViewController.xib" />
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Resources\Images.xcassets\AppIcons-1.appiconset\Contents.json" />
