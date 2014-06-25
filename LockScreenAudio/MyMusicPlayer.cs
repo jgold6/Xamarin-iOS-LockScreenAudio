@@ -124,6 +124,7 @@ namespace LockScreenAudio
 		public void playStreamingSong (Song song)
 		{
 			songs.Clear();
+			avQueuePlayer.RemoveAllItems();
 			songs.Add(song);
 			currentSongIndex = 0;
 			// try different approach
