@@ -36,14 +36,14 @@
                                     <rect key="frame" x="0.0" y="0.0" width="287" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="phq-AM-6qj" fixedFrame="YES">
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="phq-AM-6qj">
                                             <rect key="frame" x="15" y="2" width="36" height="22"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         </label>
-                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="S69-Yl-6jw" fixedFrame="YES">
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="S69-Yl-6jw">
                                             <rect key="frame" x="15" y="24" width="50" height="17"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -176,14 +176,14 @@
                             <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ygH-mj-ela">
                                 <rect key="frame" x="225" y="423" width="75" height="37"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Next&gt;">
+                                <state key="normal" title="Next>">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <action selector="nextBtnTapped:" destination="21" eventType="touchUpInside" id="SLZ-Wk-dut"/>
                                 </connections>
                             </button>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="45" misplaced="YES" userInteractionEnabled="NO" inspectedAnimating="NO" inspectedHidesWhenStopped="NO" hidden="YES">
+                            <activityIndicatorView hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" hidesWhenStopped="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="45">
                                 <rect key="frame" x="142" y="207" width="37" height="37"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <constraints>
@@ -194,6 +194,8 @@
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="45" firstAttribute="centerX" secondItem="zHm-ok-kau" secondAttribute="centerX" id="52"/>
+                            <constraint firstItem="45" firstAttribute="top" secondItem="22" secondAttribute="top" constant="207" id="54"/>
                             <constraint firstAttribute="trailing" secondItem="ygH-mj-ela" secondAttribute="trailing" constant="20" id="0g9-ti-2p8"/>
                             <constraint firstItem="zHm-ok-kau" firstAttribute="top" secondItem="vWj-JZ-yDJ" secondAttribute="bottom" constant="8" id="11m-ot-Jee"/>
                             <constraint firstItem="vWj-JZ-yDJ" firstAttribute="leading" secondItem="22" secondAttribute="leading" constant="20" id="1yU-H1-JiV"/>
@@ -224,12 +226,11 @@
                             <constraint firstAttribute="trailing" secondItem="o1l-nJ-cNQ" secondAttribute="trailing" constant="20" id="ril-T6-Sf5"/>
                             <constraint firstAttribute="trailing" secondItem="Bha-1s-NQJ" secondAttribute="trailing" constant="20" id="sfY-Mu-1hY"/>
                             <constraint firstItem="oGS-aD-b1C" firstAttribute="top" secondItem="iS3-1I-4S8" secondAttribute="bottom" constant="8" id="vwT-DY-PCi"/>
-                            <constraint firstItem="45" firstAttribute="centerX" secondItem="zHm-ok-kau" secondAttribute="centerX" constant="0.0" id="52"/>
-                            <constraint id="54" firstItem="45" firstAttribute="top" secondItem="22" secondAttribute="top" constant="207"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Song Detail" id="26"/>
                     <connections>
+                        <outlet property="actIndView" destination="45" id="name-outlet-45"/>
                         <outlet property="albumNameLabel" destination="o1l-nJ-cNQ" id="Am0-Qj-lhw"/>
                         <outlet property="artistNameLabel" destination="gn0-Vd-7Wf" id="Vjb-Nf-WKF"/>
                         <outlet property="artworkView" destination="zHm-ok-kau" id="kBc-Qx-vtK"/>
@@ -238,7 +239,6 @@
                         <outlet property="prevBtn" destination="Iz5-qi-S2W" id="sTj-jl-kIM"/>
                         <outlet property="songIdLabel" destination="Bha-1s-NQJ" id="eau-p5-z53"/>
                         <outlet property="songTitleLabel" destination="j46-52-1gd" id="atR-mA-RsM"/>
-                        <outlet property="actIndView" destination="45" id="name-outlet-45"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="23" sceneMemberID="firstResponder"/>

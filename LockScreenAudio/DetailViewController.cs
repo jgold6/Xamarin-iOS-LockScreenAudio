@@ -57,6 +57,8 @@ namespace LockScreenAudio
 			musicPlayer = new MyMusicPlayer(this);
 			// Play song (and load all songs by artist to player queue)
 			if (song.streamingURL == null) {
+				actIndView.StopAnimating();
+				actIndView.Hidden = true;
 				musicPlayer.playSongWithId(song.songID);
 				prevBtn.UserInteractionEnabled = true;
 				prevBtn.TintColor = UIColor.Blue;
