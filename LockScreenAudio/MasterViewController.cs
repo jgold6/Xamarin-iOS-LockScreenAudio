@@ -21,7 +21,6 @@ namespace LockScreenAudio
 		StreamAndSave
 	}
 
-	// TODO: Get playlists from the web. Use a segmented button to choose between web content or local content. 
 	public partial class MasterViewController : UITableViewController
 	{
 		UIBarButtonItem leftBBI;

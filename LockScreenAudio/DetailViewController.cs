@@ -12,7 +12,6 @@ using MonoTouch.ObjCRuntime;
 
 namespace LockScreenAudio
 {
-	//TODO: Activity indicator for when streaming song is loading and progress bar for download. Can use the every 5 second listener to for updates. 
 	public partial class DetailViewController : UIViewController
 	{
 		#region - instance variables
@@ -20,7 +19,6 @@ namespace LockScreenAudio
 		public Song song { get; set;} 
 		// The Music Player
 		public MyMusicPlayer musicPlayer {get; set;}
-
 		#endregion
 
 		#region - Constructors
@@ -68,6 +66,8 @@ namespace LockScreenAudio
 				playPause.TintColor = UIColor.Blue;
 			}
 			else {
+				actIndView.StartAnimating();
+				actIndView.Hidden = false;
 				musicPlayer.playStreamingSong(song);
 				prevBtn.UserInteractionEnabled = false;
 				prevBtn.TintColor = UIColor.DarkGray;
@@ -84,6 +84,8 @@ namespace LockScreenAudio
 		public override void ViewWillDisappear(bool animated)
 		{
 			base.ViewWillDisappear(animated);
+			actIndView.StopAnimating();
+			actIndView.Hidden = true;
 			// Clear the music player
 			musicPlayer.cleanUp();
 			// Unregister for control events
@@ -174,6 +176,8 @@ namespace LockScreenAudio
 		{
 			playPause.UserInteractionEnabled = true;
 			playPause.TintColor = UIColor.Blue;
+			actIndView.StopAnimating();
+			actIndView.Hidden = true;
 		}
 
 		#endregion
