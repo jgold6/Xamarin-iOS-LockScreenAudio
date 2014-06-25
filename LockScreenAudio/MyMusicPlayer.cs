@@ -89,7 +89,6 @@ namespace LockScreenAudio
 
 				foreach (string artist in aSongs) {
 					if (artist == mediaItem.Artist) {
-						songs.Clear();
 						Songs.artistSongs.TryGetValue(artist, out songs);
 						if (songs.Count > 0) {
 
@@ -123,7 +122,6 @@ namespace LockScreenAudio
 
 		public void playStreamingSong (Song song)
 		{
-			songs.Clear();
 			avQueuePlayer.RemoveAllItems();
 			songs.Add(song);
 			currentSongIndex = 0;
@@ -247,7 +245,6 @@ namespace LockScreenAudio
 		public void cleanUp()
 		{
 			avQueuePlayer.RemoveAllItems();
-			songs.Clear();
 			if (streamingItem != null)
 				streamingItem = null;
 		}
