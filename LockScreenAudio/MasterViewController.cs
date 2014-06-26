@@ -51,7 +51,7 @@ namespace LockScreenAudio
 
 			leftBBI = new UIBarButtonItem("Stream a song", UIBarButtonItemStyle.Bordered, this, new Selector("StreamSong:"));
 			this.NavigationItem.LeftBarButtonItem = leftBBI;
-
+			this.TableView.SectionIndexTrackingBackgroundColor = UIColor.FromRGB(0.9f, 0.9f, 0.9f);
 			this.TableView.ReloadData();
 		}
 
