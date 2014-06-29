@@ -20,21 +20,22 @@ namespace LockScreenAudio
 	public class MyMusicPlayer : NSObject
 	{
 		#region - Private instance variables
-		List<Song> songs = new List<Song>();
-		int currentSongIndex = 0;
-		AVQueuePlayer avQueuePlayer = new AVQueuePlayer();
+		AVPlayer avPlayer = new AVPlayer();
 		float SEEK_RATE = 10.0f;
+		private AVPlayerItem item;
 		private AVPlayerItem streamingItem;
+
 		#endregion
 
 		#region - Public properties
 		public DetailViewController dvc { get; set;}
+
 		public float Rate { 
 			get {
-				return avQueuePlayer.Rate;
+				return avPlayer.Rate;
 			}
 			set {
-				avQueuePlayer.Rate = value;
+				avPlayer.Rate = value;
 			}
 		}
 		#endregion
@@ -57,20 +58,20 @@ namespace LockScreenAudio
 			avSession.SetActive(true, out activationError);
 			if (activationError != null)
 				Console.WriteLine("Could not activate audio session {0}", activationError.LocalizedDescription);
-			avQueuePlayer.ActionAtItemEnd = AVPlayerActionAtItemEnd.None;
-			avQueuePlayer.AddPeriodicTimeObserver(CMTime.FromSeconds(5.0, 1), DispatchQueue.MainQueue, delegate(CMTime time) {
+			avPlayer.ActionAtItemEnd = AVPlayerActionAtItemEnd.None;
+			avPlayer.AddPeriodicTimeObserver(CMTime.FromSeconds(5.0, 1), DispatchQueue.MainQueue, delegate(CMTime time) {
 				Console.WriteLine("Seconds: {0}, Value: {1}", time.Seconds, time.Value);
 
-				if (time.Seconds >= avQueuePlayer.CurrentItem.Duration.Seconds -1.0) {
-					NextTrack();
+				if (time.Seconds >= avPlayer.CurrentItem.Duration.Seconds -1.0) {
+					dvc.PlayNextSong();
 				}
-				else if (avQueuePlayer.Rate > 1.0f && time.Seconds >= avQueuePlayer.CurrentItem.Duration.Seconds -6.0) {
-					avQueuePlayer.Rate = 1.0f;
-					NextTrack();
+				else if (avPlayer.Rate > 1.0f && time.Seconds >= avPlayer.CurrentItem.Duration.Seconds -6.0) {
+					avPlayer.Rate = 1.0f;
+					dvc.PlayNextSong();
 				}
-				else if (avQueuePlayer.Rate < 0 && time.Seconds <= 6.0) {
-					avQueuePlayer.Rate = 1.0f;
-					PreviousTrack();
+				else if (avPlayer.Rate < 0 && time.Seconds <= 6.0) {
+					avPlayer.Rate = 1.0f;
+					dvc.PlayPrevSong();
 				}
 			});
 		}
@@ -78,176 +79,87 @@ namespace LockScreenAudio
 
 		#region - Public methods
 		// Play song from persistentSongID
-		public void playSongWithId(ulong songId)
+		public void playSong(Song song)
 		{
-			streamingItem = null;
-			MusicQuery musicQuery = new MusicQuery();
-			MPMediaItem mediaItem = musicQuery.queryForSongWithId(songId);
-			if (mediaItem != null) {
-				var aSongs = Songs.artistSongs.Keys;
-				int index = 0;
-
-				foreach (string artist in aSongs) {
-					if (artist == mediaItem.Artist) {
-						Songs.artistSongs.TryGetValue(artist, out songs);
-						if (songs.Count > 0) {
-
-							foreach (Song song in songs) {
-								MPMediaItem mi = musicQuery.queryForSongWithId(song.songID);
-								if (mi != null) {
-									AVPlayerItem item = null;
-									NSUrl Url = mi.AssetURL;
-									item = AVPlayerItem.FromUrl(Url);
-									if (item != null) {
-										this.avQueuePlayer.InsertItem(item, null);
-									}
-									if (mi == mediaItem) {
-										currentSongIndex = index;
-										MPNowPlayingInfo np = new MPNowPlayingInfo();
-										SetNowPlayingInfo(song, np);
-									}
-								}
-								index++;
-							}
-							for (int i = 0; i < currentSongIndex; i++) {
-								avQueuePlayer.AdvanceToNextItem();
-							}
-							this.play();
-						}
-						return;
-					}
-				} // end artist loop
+			if (song.streamingURL == null) {
+				MusicQuery musicQuery = new MusicQuery();
+				MPMediaItem mediaItem = musicQuery.queryForSongWithId(song.songID);
+				if (mediaItem != null) {
+					NSUrl Url = mediaItem.AssetURL;
+					item = AVPlayerItem.FromUrl(Url);					
+					if (item != null) {
+						this.avPlayer.ReplaceCurrentItemWithPlayerItem(item);
+					}					
+					MPNowPlayingInfo np = new MPNowPlayingInfo();
+					SetNowPlayingInfo(song, np);					
+					this.play();					
+				}
 			}
-		}
-
-		public void playStreamingSong (Song song)
-		{
-			avQueuePlayer.RemoveAllItems();
-			songs.Add(song);
-			currentSongIndex = 0;
-			// try different approach
-			NSUrl nsUrl = NSUrl.FromString(song.streamingURL);
-			streamingItem = AVPlayerItem.FromUrl(nsUrl);
-			avQueuePlayer.InsertItem(streamingItem, null);
-			streamingItem.AddObserver(this, new NSString("status"), NSKeyValueObservingOptions.New, avQueuePlayer.Handle);
-			//NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("playerItemDidReachEnd:"), AVPlayerItem.DidPlayToEndTimeNotification, streamingItem);
+			else {
+				NSUrl nsUrl = NSUrl.FromString(song.streamingURL);
+				streamingItem = AVPlayerItem.FromUrl(nsUrl);
+				avPlayer.ReplaceCurrentItemWithPlayerItem(streamingItem);
+				streamingItem.AddObserver(this, new NSString("status"), NSKeyValueObservingOptions.New, avPlayer.Handle);
+				//NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("playerItemDidReachEnd:"), AVPlayerItem.DidPlayToEndTimeNotification, streamingItem);
+			}
 		}
 
 		public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
 		{
-			Console.WriteLine("Status Observed Method {0}", avQueuePlayer.Status);
-			if (avQueuePlayer.Status == AVPlayerStatus.ReadyToPlay) {
+			Console.WriteLine("Status Observed Method {0}", avPlayer.Status);
+			if (avPlayer.Status == AVPlayerStatus.ReadyToPlay) {
 				dvc.enablePlayPauseButton();
 
-				songs[currentSongIndex].duration = streamingItem.Duration.Seconds;
+				dvc.song.duration = streamingItem.Duration.Seconds;
 				MPNowPlayingInfo np = new MPNowPlayingInfo();
-				SetNowPlayingInfo(songs[currentSongIndex], np);
+				SetNowPlayingInfo(dvc.song, np);
 				this.play();
 			}
-			else if (avQueuePlayer.Status == AVPlayerStatus.Failed) {
+			else if (avPlayer.Status == AVPlayerStatus.Failed) {
 				Console.WriteLine("Stream Failed");
 			}
 		}
 
 		public void pause()
 		{
-			this.avQueuePlayer.Pause();
+			this.avPlayer.Pause();
 		}
 
 		public void play()
 		{
-			this.avQueuePlayer.Play();
+			this.avPlayer.Play();
 		}
-
-		public void PreviousTrack()
-		{
-			if (currentSongIndex > 0) {
-				currentSongIndex--;
-				avQueuePlayer.RemoveAllItems();
-				int index = 0;
-				foreach (Song song in songs) {
-					if (index>=currentSongIndex) {
-						MusicQuery musicQuery = new MusicQuery();
-						MPMediaItem mi = musicQuery.queryForSongWithId(song.songID);
-						if (mi != null) {
-							NSUrl Url = mi.AssetURL;
-							AVPlayerItem item =  null;
-							item = AVPlayerItem.FromUrl(Url);
-							if (item != null) {
-								this.avQueuePlayer.InsertItem(item, null);
-								if (index == currentSongIndex) {
-									dvc.song = song;
-									MPNowPlayingInfo np = new MPNowPlayingInfo();
-									np.PlaybackRate = 1.0f;
-									SetNowPlayingInfo(dvc.song, np);
-									dvc.DisplaySongInfo();
-								}
-							}
-						}
-					}
-					index++;
-				}
-			}
-		}
-
-		public void NextTrack()
-		{
-			if (currentSongIndex < songs.Count - 1) {
-				this.avQueuePlayer.AdvanceToNextItem();
-				currentSongIndex++;
-				dvc.song = songs[currentSongIndex];
-				MPNowPlayingInfo np = new MPNowPlayingInfo();
-				np.PlaybackRate = 1.0f;
-				SetNowPlayingInfo(dvc.song, np);
-				dvc.DisplaySongInfo();
-			}
-		}
-
-		// TODO: Handle song end event. As it is the next song plays if there is one, 
-		// but the data for the new song is not displayed.
 
 		// Handle control events from lock or control screen
 		public void RemoteControlReceived(UIEvent theEvent)
 		{
 			MPNowPlayingInfo np = new MPNowPlayingInfo();
 			if (theEvent.Subtype == UIEventSubtype.RemoteControlPause) {
-				this.avQueuePlayer.Pause();
+				this.avPlayer.Pause();
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlPlay) {
-				this.avQueuePlayer.Play();
-			}
-			else if (theEvent.Subtype == UIEventSubtype.RemoteControlPreviousTrack) {
-				PreviousTrack();
-			}
-			else if (theEvent.Subtype == UIEventSubtype.RemoteControlNextTrack) {
-				NextTrack();
+				this.avPlayer.Play();
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlBeginSeekingForward) {
-				avQueuePlayer.Rate = SEEK_RATE;
+				avPlayer.Rate = SEEK_RATE;
 				np.PlaybackRate = SEEK_RATE;
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlEndSeekingForward) {
-				avQueuePlayer.Rate = 1.0f;
+				avPlayer.Rate = 1.0f;
 				np.PlaybackRate = 1.0f;
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlBeginSeekingBackward) {
-				avQueuePlayer.Rate = -SEEK_RATE;
+				avPlayer.Rate = -SEEK_RATE;
 				np.PlaybackRate = -SEEK_RATE;
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlEndSeekingBackward) {
-				avQueuePlayer.Rate = 1.0f;
+				avPlayer.Rate = 1.0f;
 				np.PlaybackRate = 1.0f;
 			}
-			np.ElapsedPlaybackTime = avQueuePlayer.CurrentTime.Seconds;
+			np.ElapsedPlaybackTime = avPlayer.CurrentTime.Seconds;
 			SetNowPlayingInfo(dvc.song, np);
 		}
 
-		public void cleanUp()
-		{
-			avQueuePlayer.RemoveAllItems();
-			if (streamingItem != null)
-				streamingItem = null;
-		}
 		#endregion
 
 		#region - Helper methods

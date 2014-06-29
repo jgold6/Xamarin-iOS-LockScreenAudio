@@ -19,6 +19,12 @@ namespace LockScreenAudio
 		public Song song { get; set;} 
 		// The Music Player
 		public MyMusicPlayer musicPlayer {get; set;}
+		// Current list of songs
+		public List<Song> currentSongList {get; set;}
+		public int currentSongIndex;
+		public int currentSongCount;
+		UIColor systemNavBarTintColor;
+
 		#endregion
 
 		#region - Constructors
@@ -37,7 +43,7 @@ namespace LockScreenAudio
 		public override void ViewDidLoad()
 		{
 			base.ViewDidLoad();
-			DisplaySongInfo();
+
 			// set up handler for when app resumes from background
 			NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("resumeFromBackground"), UIApplication.DidBecomeActiveNotification, null);
 		}
@@ -45,8 +51,20 @@ namespace LockScreenAudio
 		public override void ViewWillAppear(bool animated)
 		{
 			base.ViewWillAppear(animated);
+			if (song.streamingURL != null) {
+				currentSongList = new List<Song>(){song};
+				currentSongCount = 1;
+				currentSongIndex = 0;
+			}
+			else {
+				currentSongList = Songs.GetSongsByArtist(song.artist);
+				currentSongCount = currentSongList.Count;
+				currentSongIndex = Songs.GetIndexOfSongByArtist(song);
+			}
+			DisplaySongInfo();
 			this.NavigationController.NavigationBar.BackgroundColor = UIColor.DarkGray;
 			this.NavigationController.NavigationBar.BarTintColor = UIColor.DarkGray;
+			systemNavBarTintColor = this.NavigationController.NavigationBar.TintColor;
 			this.NavigationController.NavigationBar.TintColor = UIColor.LightGray;
 		}
 
@@ -59,25 +77,18 @@ namespace LockScreenAudio
 			if (song.streamingURL == null) {
 				actIndView.StopAnimating();
 				actIndView.Hidden = true;
-				musicPlayer.playSongWithId(song.songID);
-				prevBtn.UserInteractionEnabled = true;
-				prevBtn.TintColor = UIColor.Blue;
-				nextBtn.UserInteractionEnabled = true;
-				nextBtn.TintColor = UIColor.Blue;
 				playPause.UserInteractionEnabled = true;
 				playPause.TintColor = UIColor.Blue;
 			}
 			else {
 				actIndView.StartAnimating();
 				actIndView.Hidden = false;
-				musicPlayer.playStreamingSong(song);
-				prevBtn.UserInteractionEnabled = false;
-				prevBtn.TintColor = UIColor.DarkGray;
-				nextBtn.UserInteractionEnabled = false;
-				nextBtn.TintColor = UIColor.DarkGray;
 				playPause.UserInteractionEnabled = false;
 				playPause.TintColor = UIColor.DarkGray;
 			}
+			musicPlayer.playSong(song);
+			SetPrevNextButtonStatus();
+
 			// Register for receiving controls from lock screen and controlscreen
 			UIApplication.SharedApplication.BeginReceivingRemoteControlEvents();
 			this.BecomeFirstResponder();
@@ -88,14 +99,13 @@ namespace LockScreenAudio
 			base.ViewWillDisappear(animated);
 			actIndView.StopAnimating();
 			actIndView.Hidden = true;
-			// Clear the music player
-			musicPlayer.cleanUp();
+			musicPlayer.pause();
 			// Unregister for control events
 			UIApplication.SharedApplication.EndReceivingRemoteControlEvents();
 			this.ResignFirstResponder();
 			this.NavigationController.NavigationBar.BackgroundColor = UIColor.White;
 			this.NavigationController.NavigationBar.BarTintColor = UIColor.White;
-			this.NavigationController.NavigationBar.TintColor = UIColor.Blue;
+			this.NavigationController.NavigationBar.TintColor = systemNavBarTintColor;
 			// Clear the music players reference back to this class - avoid retain cycle
 			musicPlayer.dvc = null;
 		}
@@ -125,14 +135,25 @@ namespace LockScreenAudio
 			{
 				playPause.SetTitle("Play", UIControlState.Normal);
 			}
-			DisplaySongInfo();
+			if (song.streamingURL == null) {
+				currentSongIndex = Songs.GetIndexOfSongByArtist(song);
+				DisplaySongInfo();
+			}
 		}
 
 		// Forward remote control received events, from the lock or control screen, to the music player.
 		public override void RemoteControlReceived(UIEvent theEvent)
 		{
-			base.RemoteControlReceived(theEvent);
-			musicPlayer.RemoteControlReceived(theEvent);
+			if (theEvent.Subtype == UIEventSubtype.RemoteControlPreviousTrack) {
+				PlayPrevSong();
+			}
+			else if (theEvent.Subtype == UIEventSubtype.RemoteControlNextTrack) {
+				PlayNextSong();
+			}
+			else {
+				base.RemoteControlReceived(theEvent);
+				musicPlayer.RemoteControlReceived(theEvent);
+			}
 		}
 		#endregion
 
@@ -153,16 +174,37 @@ namespace LockScreenAudio
 
 		partial void prevButtonTapped(UIButton sender)
 		{
-			musicPlayer.PreviousTrack();
+			PlayPrevSong();
 		}
 
 		partial void nextBtnTapped(UIButton sender)
 		{
-			musicPlayer.NextTrack();
+			PlayNextSong();
 		}
 		#endregion
 
 		#region - Class helper methods
+
+		public void PlayPrevSong()
+		{
+			if (currentSongIndex >0) {
+				currentSongIndex--;
+				song = currentSongList[currentSongIndex];
+				musicPlayer.playSong(song);
+				DisplaySongInfo();
+			}
+		}
+
+		public void PlayNextSong()
+		{
+			if (currentSongIndex + 1 < currentSongCount) {
+				currentSongIndex++;
+				song = currentSongList[currentSongIndex];
+				musicPlayer.playSong(song);
+				DisplaySongInfo();
+			}
+		}
+
 		public void DisplaySongInfo()
 		{
 			// Display info for current song as might've changed
@@ -172,6 +214,28 @@ namespace LockScreenAudio
 			songIdLabel.Text = song.streamingURL == null ? song.songID.ToString() : song.streamingURL;
 			if (song.artwork != null)
 				artworkView.Image = song.artwork.ImageWithSize(new SizeF(115.0f, 115.0f));
+			this.NavigationItem.Title = String.Format("Playing song {0} of {1}", currentSongIndex + 1, currentSongCount);
+			SetPrevNextButtonStatus();
+		}
+
+		public void SetPrevNextButtonStatus() {
+			if (currentSongIndex == 0) {
+				prevBtn.UserInteractionEnabled = false;
+				prevBtn.TintColor = UIColor.DarkGray;
+			}
+			else {
+				prevBtn.UserInteractionEnabled = true;
+				prevBtn.TintColor = UIColor.Blue;
+			}
+			if (currentSongIndex + 1 == currentSongCount) {
+				nextBtn.UserInteractionEnabled = false;
+				nextBtn.TintColor = UIColor.DarkGray;
+			}
+			else {
+				nextBtn.UserInteractionEnabled = true;
+				nextBtn.TintColor = UIColor.Blue;
+			}
+
 		}
 
 		public void enablePlayPauseButton()

@@ -75,7 +75,7 @@ namespace LockScreenAudio
 				else {
 					// Selected song
 					NSIndexPath indexPath = this.TableView.IndexPathForSelectedRow;
-					Song song = GetSong(indexPath);
+					Song song = Songs.GetSongBySectionRow(indexPath.Section, indexPath.Row);
 					song.streamingURL = null;
 					// Pass song info to the detail view controller
 					detailVC.song = song;
@@ -93,20 +93,12 @@ namespace LockScreenAudio
 		#region - Table View data source overrides
 		public override int NumberOfSections(UITableView tableView)
 		{
-			return Songs.artistSongs.Keys.Count;
+			return Songs.artistCount;
 		}
 
 		public override int RowsInSection(UITableView tableview, int section)
 		{
-			var artists = Songs.artistSongs.Values;
-			int index = 0;
-			foreach (List<Song> value in artists) {
-				if (index == section)
-					return value.Count;
-				else
-					index++;
-			}
-			return 0;
+			return Songs.GetSongsByArtistIndex(section).Count;
 		}
 
 		string[] alphabet = new string[]{"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
@@ -116,8 +108,9 @@ namespace LockScreenAudio
 		public override string[] SectionIndexTitles(UITableView tableView)
 		{
 			List<string> index = new List<string>();
-			var artists = Songs.artistSongs.Keys.ToList();
+			List<string> artists = Songs.GetListOfArtists();
 			string lastChar = "";
+
 			foreach (string artist in artists) {
 				string initialLetter = "";
 				if (artist.Length > 4 && artist.Substring(0,4) == "The ") {
@@ -150,7 +143,7 @@ namespace LockScreenAudio
 		// Get the section to scroll to when the side index is used
 		public override int SectionFor(UITableView tableView, string title, int atIndex)
 		{
-			var artists = Songs.artistSongs.Keys;
+			List<string> artists = Songs.GetListOfArtists();;
 			int section = 0;
 
 			foreach (string artist in artists) {
@@ -189,7 +182,7 @@ namespace LockScreenAudio
 
 			UIImageView artworkView = new UIImageView(new RectangleF(0.0f, 0.0f, 30.0f, 30.0f));
 			NSIndexPath indexPath = NSIndexPath.FromRowSection(0, section);
-			Song song = GetSong(indexPath);
+			Song song = Songs.GetSongBySectionRow(indexPath.Section, indexPath.Row);
 			artworkView.Image = song.artwork.ImageWithSize(new SizeF(30.0f, 30.0f));
 
 			UIView headerView = new UIView();
@@ -203,16 +196,7 @@ namespace LockScreenAudio
 		// Get the text for the section header view 
 		public override string TitleForHeader(UITableView tableView, int section)
 		{
-			var artists = Songs.artistSongs.Keys;
-			int index = 0;
-			foreach (string artist in artists) {
-				if (index == section) {
-					return artist;
-				}
-				else
-					index++;
-			}
-			return "No Artist";
+			return Songs.GetArtistByIndex(section);
 		}
 
 		// Set up the table view cells
@@ -222,7 +206,7 @@ namespace LockScreenAudio
 			if (cell == null)
 				cell = new UITableViewCell(UITableViewCellStyle.Subtitle, "cell");
 
-			Song song = GetSong(indexPath);
+			Song song = Songs.GetSongBySectionRow(indexPath.Section, indexPath.Row);
 
 			cell.TextLabel.Text = song.song;
 			cell.DetailTextLabel.Text = String.Format("Album: {0}", song.album);
@@ -232,23 +216,6 @@ namespace LockScreenAudio
 		#endregion
 
 		#region - class helper methods
-		// Get the song from an index path
-		private Song GetSong(NSIndexPath indexPath)
-		{
-			var artists = Songs.artistSongs.Values;
-			int index = 0;
-			List<Song> songs = new List<Song>();
-			foreach (List<Song> value in artists) {
-				if (index == indexPath.Section) {
-					songs = value;
-					break;
-				}
-				else
-					index++;
-			}
-			return songs[indexPath.Row];
-		}
-
 		[Export("StreamSong:")]
 		public void StreamSong(UIBarButtonItem sender)
 		{
