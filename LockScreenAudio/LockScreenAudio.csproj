@@ -123,6 +123,7 @@
     <Compile Include="Song.cs" />
     <Compile Include="Songs.cs" />
     <Compile Include="MyMusicPlayer.cs" />
+    <Compile Include="ArtistSongTableViewSource.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
