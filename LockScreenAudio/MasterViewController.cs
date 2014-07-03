@@ -123,20 +123,14 @@ namespace LockScreenAudio
 		[Export ("searchDisplayControllerWillBeginSearch:")]
 		public void WillBeginSearch(UISearchDisplayController controller)
 		{
-			Songs.FilterContentsForSearch("");
 			Songs.searching = true;
-//			tableView.ReloadData();
-//			controller.SearchResultsTableView.ReloadData();
+			Songs.FilterContentsForSearch("");
 		}
 
 		[Export ("searchDisplayController:shouldReloadTableForSearchString:")]
 		public bool ShouldReloadForSearchString(UISearchDisplayController controller, string forSearchString)
 		{
-//			var source = controller.SearchResultsTableView.Source as ArtistSongTableViewSource;
 			Songs.FilterContentsForSearch(forSearchString);
-//			tableView.ReloadData();
-//			controller.SearchResultsTableView.ReloadData();
-			//ControllerHelpers.TitleCountUpdater(source.GetItemCount());
 			return true;
 		}
 
@@ -144,9 +138,6 @@ namespace LockScreenAudio
 		public void DidEndSearch(UISearchDisplayController controller)
 		{
 			Songs.searching = false;
-//			tableView.ReloadData();
-//			controller.SearchResultsTableView.ReloadData();
-			//ControllerHelpers.TitleCountUpdater(source.GetItemCount());
 		}
 		#endregion
 	}

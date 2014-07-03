@@ -12,7 +12,7 @@ namespace LockScreenAudio
 		public static int artistCount { get; private set;}
 
 
-		public static Dictionary<string, List<Song>> searchResults;
+		public static Dictionary<string, List<Song>> searchResults = new Dictionary<string, List<Song>>();
 		public static int searchSongCount { get; private set;}
 		public static int searchArtistCount { get; private set;}
 
@@ -64,12 +64,11 @@ namespace LockScreenAudio
 
 		public static Song GetSongBySectionRow(int section, int row)
 		{
-			List<List<Song>> SongList;
+
 			if (searching)
-				SongList = searchResults.Values.ToList();
+				return searchResults.Values.ToList()[section][row];
 			else
-				SongList = artistSongs.Values.ToList();
-			return SongList[section][row];
+				return artistSongs.Values.ToList()[section][row];
 //			var artistSongList = artistSongs.Values.ToList();
 //			return artistSongList[section][row];
 		}
@@ -121,9 +120,8 @@ namespace LockScreenAudio
 
 		public static void FilterContentsForSearch(string str)
 		{
-			searchResults = artistSongs.Where(a => a.Key.ToLower().Contains(str.ToLower())).ToDictionary(a => a.Key, a => a.Value);
-			Dictionary<string, List<Song>> otherArtistSongs = artistSongs.Where(a => !a.Key.ToLower().Contains(str.ToLower())).ToDictionary(a => a.Key, a => a.Value);
-			foreach (List<Song> songs in otherArtistSongs.Values) {
+			searchResults.Clear();
+			foreach (List<Song> songs in artistSongs.Values) {
 				List<Song> matchingSongs = songs.Where(a => a.song.ToLower().Contains(str.ToLower())).ToList();
 				if (matchingSongs.Count > 0)
 					searchResults.Add(matchingSongs[0].artist, matchingSongs);
@@ -134,7 +132,6 @@ namespace LockScreenAudio
 			foreach (List<Song> songs in artists) {
 				searchSongCount += songs.Count;
 			}
-			searchResults = searchResults.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
 		}
 	}
 }
