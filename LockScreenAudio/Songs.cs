@@ -121,11 +121,28 @@ namespace LockScreenAudio
 		public static void FilterContentsForSearch(string str)
 		{
 			searchResults.Clear();
-			foreach (List<Song> songs in artistSongs.Values) {
-				List<Song> matchingSongs = songs.Where(a => a.song.ToLower().Contains(str.ToLower())).ToList();
-				if (matchingSongs.Count > 0)
-					searchResults.Add(matchingSongs[0].artist, matchingSongs);
+
+			// Song and Artist search
+			foreach (string artist in artistSongs.Keys) {
+				List<Song> songs  = GetSongsByArtist(artist);
+				if (artist.ToLower().Contains(str.ToLower())) {
+					searchResults.Add(artist, songs);
+				}
+				else {
+					List<Song> matchingSongs = songs.Where(a => a.song.ToLower().Contains(str.ToLower())).ToList();
+					if (matchingSongs.Count > 0)
+						searchResults.Add(artist, matchingSongs);
+				}
+
 			}
+
+			// Song only search
+//			foreach (List<Song> songs in artistSongs.Values) {
+//				List<Song> matchingSongs = songs.Where(a => a.song.ToLower().Contains(str.ToLower())).ToList();
+//				if (matchingSongs.Count > 0)
+//					searchResults.Add(matchingSongs[0].artist, matchingSongs);
+//			}
+
 			searchArtistCount = searchResults.Keys.Count;
 			var artists = searchResults.Values;
 			searchSongCount = 0;
