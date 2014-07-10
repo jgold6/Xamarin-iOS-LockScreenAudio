@@ -55,9 +55,15 @@ namespace LockScreenAudio
 			searchBar.SizeToFit();
 
 			TableView.TableHeaderView = searchBar;
+			// Alternate - display artist/song count in table header view and the search bar in the Navigation bar
+//			TableView.TableHeaderView = new UILabel(new RectangleF(0.0f, 0.0f, TableView.Frame.Width, 30.0f)){
+//				Text = String.Format("Songs ({0}) by Artist ({1})", Songs.songCount, Songs.artistCount),
+//				AutoresizingMask = UIViewAutoresizing.All
+//			};
 
 			searchController = new UISearchDisplayController(searchBar, this);
 
+//			searchController.DisplaysSearchBarInNavigationBar = true;
 			searchController.WeakDelegate = this;
 			searchController.SearchResultsSource = tableView.Source;
 
