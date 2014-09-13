@@ -1,1 +1,4 @@
 *.userprefs
+packages/*
+*/bin/*
+*/obj/*
