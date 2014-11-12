@@ -115,7 +115,8 @@ namespace LockScreenAudio
 			UIImageView artworkView = new UIImageView(new RectangleF(0.0f, 0.0f, 30.0f, 30.0f));
 			NSIndexPath indexPath = NSIndexPath.FromRowSection(0, section);
 			Song song = Songs.GetSongBySectionRow(indexPath.Section, indexPath.Row);
-			artworkView.Image = song.artwork.ImageWithSize(new SizeF(30.0f, 30.0f));
+			if (song.artwork != null)
+				artworkView.Image = song.artwork.ImageWithSize(new SizeF(30.0f, 30.0f));
 
 			UIView headerView = new UIView(new RectangleF(0, 0, tableView.Frame.Width, 30));
 			headerView.BackgroundColor = UIColor.DarkGray;
