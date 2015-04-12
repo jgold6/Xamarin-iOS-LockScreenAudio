@@ -65,6 +65,9 @@ namespace LockScreenAudio
 			leftBBI = new UIBarButtonItem("Stream a song", UIBarButtonItemStyle.Bordered, this, new Selector("StreamSong:"));
 			this.NavigationItem.LeftBarButtonItem = leftBBI;
 			this.TableView.SectionIndexTrackingBackgroundColor = UIColor.FromRGB(0.9f, 0.9f, 0.9f);
+			WeakReference mvc = new WeakReference(this);
+			tableView.Source = new ArtistSongTableViewSource(mvc);
+
 			this.TableView.ReloadData();
 		}
 
@@ -74,7 +77,6 @@ namespace LockScreenAudio
 			Songs.querySongs();
 			this.Title = String.Format("Songs ({0}) by Artist ({1})", Songs.songCount, Songs.artistCount);
 
-			tableView.Source = new ArtistSongTableViewSource(this);
 			this.TableView.ReloadData();
 		}
 
