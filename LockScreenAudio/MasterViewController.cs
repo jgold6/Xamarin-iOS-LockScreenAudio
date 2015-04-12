@@ -42,11 +42,6 @@ namespace LockScreenAudio
 		public override void ViewDidLoad()
 		{
 			base.ViewDidLoad();
-			Songs.querySongs();
-			this.Title = String.Format("Songs ({0}) by Artist ({1})", Songs.songCount, Songs.artistCount);
-
-			tableView.Source = new ArtistSongTableViewSource(this);
-
 			searchBar = new UISearchBar(new RectangleF (0, 0, 320, 44)) {
 				Placeholder = "Search",
 				AutocorrectionType = UITextAutocorrectionType.No,
@@ -70,6 +65,16 @@ namespace LockScreenAudio
 			leftBBI = new UIBarButtonItem("Stream a song", UIBarButtonItemStyle.Bordered, this, new Selector("StreamSong:"));
 			this.NavigationItem.LeftBarButtonItem = leftBBI;
 			this.TableView.SectionIndexTrackingBackgroundColor = UIColor.FromRGB(0.9f, 0.9f, 0.9f);
+			this.TableView.ReloadData();
+		}
+
+		public override void ViewDidAppear(bool animated)
+		{
+			base.ViewDidAppear(animated);
+			Songs.querySongs();
+			this.Title = String.Format("Songs ({0}) by Artist ({1})", Songs.songCount, Songs.artistCount);
+
+			tableView.Source = new ArtistSongTableViewSource(this);
 			this.TableView.ReloadData();
 		}
 
