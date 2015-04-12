@@ -22,22 +22,14 @@ namespace LockScreenAudio
 		#region - Table View data source overrides
 		public override nint NumberOfSections(UITableView tableView)
 		{
-			if (Songs.artistCount == 0) {
-				return 1;
-			}
-			else {
-				if (Songs.searching)
-					return Songs.searchArtistCount;
-				else
-					return Songs.artistCount;
-			}
+			if (Songs.searching)
+				return Songs.searchArtistCount;
+			else
+				return Songs.artistCount;
 		}
 
 		public override nint RowsInSection(UITableView tableview, nint section)
 		{
-			if (Songs.artistCount == 0) {
-				return 1;
-			}
 			return Songs.GetSongsByArtistIndex((int)section).Count;
 		}
 
@@ -47,9 +39,6 @@ namespace LockScreenAudio
 		//Provide an index in the table for quick scrolling
 		public override String[] SectionIndexTitles(UITableView tableView)
 		{
-			if (Songs.artistCount == 0) {
-				return null;
-			}
 			List<string> index = new List<string>();
 			List<string> artists = Songs.GetListOfArtists();
 			string lastChar = "";
@@ -117,9 +106,6 @@ namespace LockScreenAudio
 		// Get the view for the section header - create and style container view, label, and image view
 		public override UIView GetViewForHeader(UITableView tableView, nint section)
 		{
-			if (Songs.artistCount == 0) {
-				return null;
-			}
 			UILabel headerLabel = new UILabel();
 			headerLabel.Frame = new CGRect(40.0f, 5.0f, tableView.Frame.Width -60.0f, 20.0f);
 			headerLabel.Font = UIFont.PreferredHeadline;
@@ -142,33 +128,22 @@ namespace LockScreenAudio
 
 		public override nfloat GetHeightForHeader(UITableView tableView, nint section)
 		{
-			if (Songs.artistCount == 0) {
-				return 0.0f;
-			}
 			return 30.0f;
 		}
 
 		// Get the text for the section header view 
 		public override string TitleForHeader(UITableView tableView, nint section)
 		{
-			if (Songs.artistCount == 0) {
-				return "";
-			}
 			return Songs.GetArtistByIndex((int)section);
 		}
 
 		// Set up the table view cells
 		public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
 		{
-			
 			UITableViewCell cell = tableView.DequeueReusableCell("cell");
 			if (cell == null)
 				cell = new UITableViewCell(UITableViewCellStyle.Subtitle, "cell");
-			if (Songs.artistCount == 0) {
-				cell.TextLabel.Text = "Loading...";
-				cell.DetailTextLabel.Text = "This may take a bit for a large library";
-				return cell;
-			}
+
 			Song song = Songs.GetSongBySectionRow(indexPath.Section, indexPath.Row);
 
 			cell.TextLabel.Text = song.song;
@@ -180,9 +155,6 @@ namespace LockScreenAudio
 
 		public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
 		{
-			if (Songs.artistCount == 0) {
-				return;
-			}
 			if (Songs.searching)
 				((MasterViewController)mvc.Target).PerformSegue("showDetail", tableView);
 		}

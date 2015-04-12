@@ -42,42 +42,44 @@ namespace LockScreenAudio
 		public override void ViewDidLoad()
 		{
 			base.ViewDidLoad();
-			searchBar = new UISearchBar(new CGRect (0, 0, 320, 44)) {
-				Placeholder = "Search",
-				AutocorrectionType = UITextAutocorrectionType.No,
-				AutocapitalizationType = UITextAutocapitalizationType.None
-			};
-			searchBar.SizeToFit();
-
-			TableView.TableHeaderView = searchBar;
-			// Alternate - display artist/song count in table header view and the search bar in the Navigation bar
-//			TableView.TableHeaderView = new UILabel(new RectangleF(0.0f, 0.0f, TableView.Frame.Width, 30.0f)){
-//				Text = String.Format("Songs ({0}) by Artist ({1})", Songs.songCount, Songs.artistCount),
-//				AutoresizingMask = UIViewAutoresizing.All
-//			};
-
-			searchController = new UISearchDisplayController(searchBar, this);
-
-//			searchController.DisplaysSearchBarInNavigationBar = true;
-			searchController.WeakDelegate = this;
-			searchController.SearchResultsSource = tableView.Source;
-
 			leftBBI = new UIBarButtonItem("Stream a song", UIBarButtonItemStyle.Bordered, this, new Selector("StreamSong:"));
 			this.NavigationItem.LeftBarButtonItem = leftBBI;
 			this.TableView.SectionIndexTrackingBackgroundColor = UIColor.FromRGB(0.9f, 0.9f, 0.9f);
-			WeakReference mvc = new WeakReference(this);
-			tableView.Source = new ArtistSongTableViewSource(mvc);
 
-			this.TableView.ReloadData();
+			tableView.Source = new EmptyTableViewSource();
 		}
 
 		public override void ViewDidAppear(bool animated)
 		{
 			base.ViewDidAppear(animated);
-			Songs.querySongs();
-			this.Title = String.Format("Songs ({0}) by Artist ({1})", Songs.songCount, Songs.artistCount);
+			if (searchBar == null) {
+				Songs.querySongs();
+				this.Title = String.Format("Songs ({0}) by Artist ({1})", Songs.songCount, Songs.artistCount);
 
-			this.TableView.ReloadData();
+				searchBar = new UISearchBar(new CGRect (0, 0, 320, 44)) {
+					Placeholder = "Search",
+					AutocorrectionType = UITextAutocorrectionType.No,
+					AutocapitalizationType = UITextAutocapitalizationType.None
+				};
+				searchBar.SizeToFit();
+
+				TableView.TableHeaderView = searchBar;
+				// Alternate - display artist/song count in table header view and the search bar in the Navigation bar
+	//			TableView.TableHeaderView = new UILabel(new RectangleF(0.0f, 0.0f, TableView.Frame.Width, 30.0f)){
+	//				Text = String.Format("Songs ({0}) by Artist ({1})", Songs.songCount, Songs.artistCount),
+	//				AutoresizingMask = UIViewAutoresizing.All
+	//			};
+
+				searchController = new UISearchDisplayController(searchBar, this);
+	//			searchController.DisplaysSearchBarInNavigationBar = true;
+
+				WeakReference mvc = new WeakReference(this);
+				tableView.Source = new ArtistSongTableViewSource(mvc);
+				searchController.WeakDelegate = this;
+				searchController.SearchResultsSource = tableView.Source;
+				tableView.ReloadData();
+				searchBar.UserInteractionEnabled = true;
+			}
 		}
 
 		// Get ready to segue to the detail view controller
@@ -105,6 +107,7 @@ namespace LockScreenAudio
 					detailVC.song = song;
 				}
 				else {
+					// Selected song
 					UITableView tv = sender as UITableView;
 					NSIndexPath indexPath = tv.IndexPathForSelectedRow;
 					Song song = Songs.GetSongBySectionRow(indexPath.Section, indexPath.Row);
