@@ -81,14 +81,13 @@ namespace LockScreenAudio
 				DetailViewController detailVC = segue.DestinationViewController as DetailViewController;
 				if (sender == leftBBI) {
 					Song song = new Song();
-					song.song = "People Let's Stop the War";
-					song.album = "brad stanfield";
-					song.artist = "brad stanfield";
-					song.duration = 300.0;
-					song.streamingURL = "http://ccmixter.org/content/bradstanfield/bradstanfield_-_People_Let_s_Stop_The_War.mp3";
+					song.song = "Crocodile Tears";
+					song.album = "Johnny Gold";
+					song.artist = "Johnny Gold";
+					song.duration = 232.0;
+					song.streamingURL = "http://johnnygold.com/music/croctears.mp3";
 					// Pass song info to the detail view controller
 					detailVC.song = song;
-
 				}
 				else if (!Songs.searching) {
 					// Selected song

@@ -216,6 +216,9 @@ namespace LockScreenAudio
 				artworkView.Image = song.artwork.ImageWithSize(new SizeF(115.0f, 115.0f));
 			this.NavigationItem.Title = String.Format("Playing song {0} of {1}", currentSongIndex + 1, currentSongCount);
 			SetPrevNextButtonStatus();
+			if (musicPlayer != null) {
+				playPause.SetTitle(musicPlayer.Rate > 0.0f ? "Pause" : "Play", UIControlState.Normal);
+			}
 		}
 
 		public void SetPrevNextButtonStatus() {
