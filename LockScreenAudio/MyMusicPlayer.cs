@@ -1,18 +1,18 @@
-﻿// Loosely based on this guide: http://www.sagorin.org/ios-playing-audio-in-background-audio/
+// Loosely based on this guide: http://www.sagorin.org/ios-playing-audio-in-background-audio/
 // and sample in Obj-C: https://github.com/jsagorin/iOSBackgroundAudio
 
 using System;
-using MonoTouch.AVFoundation;
-using MonoTouch.Foundation;
-using MonoTouch.AudioToolbox;
-using MonoTouch.MediaPlayer;
-using MonoTouch.UIKit;
+using AVFoundation;
+using Foundation;
+using AudioToolbox;
+using MediaPlayer;
+using UIKit;
 using System.Collections.Generic;
-using MonoTouch.CoreMedia;
-using MonoTouch.CoreFoundation;
+using CoreMedia;
+using CoreFoundation;
 using System.Net;
 using System.IO;
-using MonoTouch.ObjCRuntime;
+using ObjCRuntime;
 using System.Diagnostics;
 
 namespace LockScreenAudio

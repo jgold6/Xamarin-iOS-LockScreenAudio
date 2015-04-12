@@ -1,12 +1,12 @@
-﻿using System;
-using System.Drawing;
+using System;
+using CoreGraphics;
 using System.Collections.Generic;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
-using MonoTouch.MediaPlayer;
+using Foundation;
+using UIKit;
+using MediaPlayer;
 using System.Linq;
-using MonoTouch.ObjCRuntime;
+using ObjCRuntime;
 
 namespace LockScreenAudio
 {
@@ -20,7 +20,7 @@ namespace LockScreenAudio
 		}
 
 		#region - Table View data source overrides
-		public override int NumberOfSections(UITableView tableView)
+		public override nint NumberOfSections(UITableView tableView)
 		{
 			if (Songs.searching)
 				return Songs.searchArtistCount;
@@ -28,16 +28,16 @@ namespace LockScreenAudio
 				return Songs.artistCount;
 		}
 
-		public override int RowsInSection(UITableView tableview, int section)
+		public override nint RowsInSection(UITableView tableview, nint section)
 		{
-			return Songs.GetSongsByArtistIndex(section).Count;
+			return Songs.GetSongsByArtistIndex((int)section).Count;
 		}
 
 		string[] alphabet = new string[]{"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
 		string[] numbers = new string[]{"0","1","2","3","4","5","6","7","8","9"};
 
 		//Provide an index in the table for quick scrolling
-		public override string[] SectionIndexTitles(UITableView tableView)
+		public override String[] SectionIndexTitles(UITableView tableView)
 		{
 			List<string> index = new List<string>();
 			List<string> artists = Songs.GetListOfArtists();
@@ -73,7 +73,7 @@ namespace LockScreenAudio
 		}
 
 		// Get the section to scroll to when the side index is used
-		public override int SectionFor(UITableView tableView, string title, int atIndex)
+		public override nint SectionFor(UITableView tableView, string title, nint atIndex)
 		{
 			List<string> artists = Songs.GetListOfArtists();
 			int section = 0;
@@ -104,21 +104,21 @@ namespace LockScreenAudio
 		}
 
 		// Get the view for the section header - create and style container view, label, and image view
-		public override UIView GetViewForHeader(UITableView tableView, int section)
+		public override UIView GetViewForHeader(UITableView tableView, nint section)
 		{
 			UILabel headerLabel = new UILabel();
-			headerLabel.Frame = new RectangleF(40.0f, 5.0f, tableView.Frame.Width -60.0f, 20.0f);
+			headerLabel.Frame = new CGRect(40.0f, 5.0f, tableView.Frame.Width -60.0f, 20.0f);
 			headerLabel.Font = UIFont.PreferredHeadline;
 			headerLabel.Text = TitleForHeader(tableView, section);
 			headerLabel.TextColor = UIColor.White;
 
-			UIImageView artworkView = new UIImageView(new RectangleF(0.0f, 0.0f, 30.0f, 30.0f));
+			UIImageView artworkView = new UIImageView(new CGRect(0.0f, 0.0f, 30.0f, 30.0f));
 			NSIndexPath indexPath = NSIndexPath.FromRowSection(0, section);
 			Song song = Songs.GetSongBySectionRow(indexPath.Section, indexPath.Row);
 			if (song.artwork != null)
-				artworkView.Image = song.artwork.ImageWithSize(new SizeF(30.0f, 30.0f));
+				artworkView.Image = song.artwork.ImageWithSize(new CGSize(30.0f, 30.0f));
 
-			UIView headerView = new UIView(new RectangleF(0, 0, tableView.Frame.Width, 30));
+			UIView headerView = new UIView(new CGRect(0, 0, tableView.Frame.Width, 30));
 			headerView.BackgroundColor = UIColor.DarkGray;
 			headerView.Add(headerLabel);
 			headerView.Add(artworkView);
@@ -126,15 +126,15 @@ namespace LockScreenAudio
 			return headerView;
 		}
 
-		public override float GetHeightForHeader(UITableView tableView, int section)
+		public override nfloat GetHeightForHeader(UITableView tableView, nint section)
 		{
 			return 30.0f;
 		}
 
 		// Get the text for the section header view 
-		public override string TitleForHeader(UITableView tableView, int section)
+		public override string TitleForHeader(UITableView tableView, nint section)
 		{
-			return Songs.GetArtistByIndex(section);
+			return Songs.GetArtistByIndex((int)section);
 		}
 
 		// Set up the table view cells

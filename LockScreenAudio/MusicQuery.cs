@@ -2,8 +2,8 @@
 // and sample in Obj-C: https://github.com/jsagorin/iOSBackgroundAudio
 
 using System;
-using MonoTouch.Foundation;
-using MonoTouch.MediaPlayer;
+using Foundation;
+using MediaPlayer;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -19,7 +19,7 @@ namespace LockScreenAudio
 		// Get the songs on the device
 		public Dictionary<string, List<Song>> queryForSongs()
 		{
-			MPMediaQuery query = MPMediaQuery.artistsQuery;
+			MPMediaQuery query = MPMediaQuery.ArtistsQuery;
 			/*
 			 	TigerMending album (12 missing on 5s) Picked up in app on 4 (and iPad Air 2!!) but not on 5s… not filtered out, just not picked up by app????
 				Casey James (“Let’s do…"Missing on 4) <<<<<<<<<<<< filtered out as they should be as they ARE icloud items (not on computer or device)

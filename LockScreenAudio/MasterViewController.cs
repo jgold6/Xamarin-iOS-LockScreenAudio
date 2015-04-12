@@ -4,14 +4,14 @@
 // branch: streamaudio
 
 using System;
-using System.Drawing;
+using CoreGraphics;
 using System.Collections.Generic;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
-using MonoTouch.MediaPlayer;
+using Foundation;
+using UIKit;
+using MediaPlayer;
 using System.Linq;
-using MonoTouch.ObjCRuntime;
+using ObjCRuntime;
 
 namespace LockScreenAudio
 {
@@ -42,7 +42,7 @@ namespace LockScreenAudio
 		public override void ViewDidLoad()
 		{
 			base.ViewDidLoad();
-			searchBar = new UISearchBar(new RectangleF (0, 0, 320, 44)) {
+			searchBar = new UISearchBar(new CGRect (0, 0, 320, 44)) {
 				Placeholder = "Search",
 				AutocorrectionType = UITextAutocorrectionType.No,
 				AutocapitalizationType = UITextAutocapitalizationType.None

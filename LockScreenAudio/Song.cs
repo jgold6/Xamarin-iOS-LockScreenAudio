@@ -1,5 +1,5 @@
-﻿using System;
-using MonoTouch.MediaPlayer;
+using System;
+using MediaPlayer;
 
 namespace LockScreenAudio
 {

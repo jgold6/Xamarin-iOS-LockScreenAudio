@@ -2,13 +2,13 @@
 // and sample in Obj-C: https://github.com/jsagorin/iOSBackgroundAudio
 
 using System;
-using System.Drawing;
+using CoreGraphics;
 using System.Collections.Generic;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
-using MonoTouch.MediaPlayer;
-using MonoTouch.ObjCRuntime;
+using Foundation;
+using UIKit;
+using MediaPlayer;
+using ObjCRuntime;
 
 namespace LockScreenAudio
 {
@@ -213,7 +213,7 @@ namespace LockScreenAudio
 			songTitleLabel.Text = song.song;
 			songIdLabel.Text = song.streamingURL == null ? song.songID.ToString() : song.streamingURL;
 			if (song.artwork != null)
-				artworkView.Image = song.artwork.ImageWithSize(new SizeF(115.0f, 115.0f));
+				artworkView.Image = song.artwork.ImageWithSize(new CGSize(115.0f, 115.0f));
 			this.NavigationItem.Title = String.Format("Playing song {0} of {1}", currentSongIndex + 1, currentSongCount);
 			SetPrevNextButtonStatus();
 			if (musicPlayer != null) {
