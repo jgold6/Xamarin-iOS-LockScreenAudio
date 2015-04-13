@@ -1,12 +1,13 @@
 ﻿<Properties GitUserInfo="UsingMD" StartupItem="LockScreenAudio/LockScreenAudio.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|iPhone" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneDeviceTarget" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="LockScreenAudio/MusicQuery.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="LockScreenAudio/MasterViewController.cs">
     <Files>
-      <File FileName="LockScreenAudio/MasterViewController.cs" Line="76" Column="4" />
+      <File FileName="LockScreenAudio/MasterViewController.cs" Line="116" Column="27" />
       <File FileName="LockScreenAudio/DetailViewController.cs" Line="224" Column="42" />
-      <File FileName="LockScreenAudio/MusicQuery.cs" Line="57" Column="3" />
-      <File FileName="LockScreenAudio/Songs.cs" Line="22" Column="32" />
-      <File FileName="LockScreenAudio/ArtistSongTableViewSource.cs" Line="139" Column="3" />
+      <File FileName="LockScreenAudio/MusicQuery.cs" Line="60" Column="2" />
+      <File FileName="LockScreenAudio/Songs.cs" Line="65" Column="41" />
+      <File FileName="LockScreenAudio/ArtistSongTableViewSource.cs" Line="147" Column="22" />
+      <File FileName="LockScreenAudio/EmptyTableViewSource.cs" Line="38" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
