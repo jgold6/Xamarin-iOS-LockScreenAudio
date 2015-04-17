@@ -3,11 +3,11 @@
   <MonoDevelop.Ide.Workbench ActiveDocument="LockScreenAudio/MasterViewController.cs">
     <Files>
       <File FileName="LockScreenAudio/MasterViewController.cs" Line="116" Column="27" />
-      <File FileName="LockScreenAudio/DetailViewController.cs" Line="224" Column="42" />
-      <File FileName="LockScreenAudio/MusicQuery.cs" Line="60" Column="2" />
-      <File FileName="LockScreenAudio/Songs.cs" Line="65" Column="41" />
-      <File FileName="LockScreenAudio/ArtistSongTableViewSource.cs" Line="147" Column="22" />
-      <File FileName="LockScreenAudio/EmptyTableViewSource.cs" Line="38" Column="3" />
+      <File FileName="LockScreenAudio/DetailViewController.cs" Line="1" Column="1" />
+      <File FileName="LockScreenAudio/MusicQuery.cs" Line="1" Column="1" />
+      <File FileName="LockScreenAudio/Songs.cs" Line="1" Column="1" />
+      <File FileName="LockScreenAudio/ArtistSongTableViewSource.cs" Line="1" Column="1" />
+      <File FileName="LockScreenAudio/EmptyTableViewSource.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
