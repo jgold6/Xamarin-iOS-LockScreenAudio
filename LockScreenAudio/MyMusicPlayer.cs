@@ -28,7 +28,7 @@ namespace LockScreenAudio
 		#endregion
 
 		#region - Public properties
-		public DetailViewController dvc { get; set;}
+		public WeakReference dvc { get; set;}
 
 		public float Rate { 
 			get {
@@ -41,7 +41,7 @@ namespace LockScreenAudio
 		#endregion
 
 		#region - Constructors
-		public MyMusicPlayer(DetailViewController viewController)
+		public MyMusicPlayer(WeakReference viewController)
 		{
 			dvc = viewController;
 			initSession();
@@ -63,15 +63,15 @@ namespace LockScreenAudio
 				Console.WriteLine("Seconds: {0}, Value: {1}", time.Seconds, time.Value);
 
 				if (time.Seconds >= avPlayer.CurrentItem.Duration.Seconds -1.0) {
-					dvc.PlayNextSong();
+					((DetailViewController)dvc.Target).PlayNextSong();
 				}
 				else if (avPlayer.Rate > 1.0f && time.Seconds >= avPlayer.CurrentItem.Duration.Seconds -6.0) {
 					avPlayer.Rate = 1.0f;
-					dvc.PlayNextSong();
+					((DetailViewController)dvc.Target).PlayNextSong();
 				}
 				else if (avPlayer.Rate < 0 && time.Seconds <= 6.0) {
 					avPlayer.Rate = 1.0f;
-					dvc.PlayPrevSong();
+					((DetailViewController)dvc.Target).PlayPrevSong();
 				}
 			});
 		}
@@ -109,11 +109,11 @@ namespace LockScreenAudio
 			Console.WriteLine("Status Observed Method {0}", avPlayer.Status);
 			if (avPlayer.Status == AVPlayerStatus.ReadyToPlay) {
 				if (dvc != null) {
-					dvc.enablePlayPauseButton ();
+					((DetailViewController)dvc.Target).enablePlayPauseButton ();
 
-					dvc.song.duration = streamingItem.Duration.Seconds;
+					((DetailViewController)dvc.Target).song.duration = streamingItem.Duration.Seconds;
 					MPNowPlayingInfo np = new MPNowPlayingInfo ();
-					SetNowPlayingInfo (dvc.song, np);
+					SetNowPlayingInfo (((DetailViewController)dvc.Target).song, np);
 					this.play ();
 				}
 			}
@@ -159,7 +159,7 @@ namespace LockScreenAudio
 				np.PlaybackRate = 1.0f;
 			}
 			np.ElapsedPlaybackTime = avPlayer.CurrentTime.Seconds;
-			SetNowPlayingInfo(dvc.song, np);
+			SetNowPlayingInfo(((DetailViewController)dvc.Target).song, np);
 		}
 
 		#endregion

@@ -72,7 +72,8 @@ namespace LockScreenAudio
 		{
 			base.ViewDidAppear(animated);
 			// Create and initialize music player
-			musicPlayer = new MyMusicPlayer(this);
+			WeakReference dvc = new WeakReference(this);
+			musicPlayer = new MyMusicPlayer(dvc);
 			// Play song (and load all songs by artist to player queue)
 			if (song.streamingURL == null) {
 				actIndView.StopAnimating();

@@ -14,16 +14,8 @@ namespace LockScreenAudio
 	[Register ("MasterViewController")]
 	partial class MasterViewController
 	{
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UITableView tableView { get; set; }
-
 		void ReleaseDesignerOutlets ()
 		{
-			if (tableView != null) {
-				tableView.Dispose ();
-				tableView = null;
-			}
 		}
 	}
 }

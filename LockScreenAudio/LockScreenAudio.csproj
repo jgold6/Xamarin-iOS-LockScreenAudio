@@ -52,11 +52,12 @@
     <ConsolePause>false</ConsolePause>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <MtouchDebug>true</MtouchDebug>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Developer: Jon Goldberger (NSCQB55JJ4)</CodesignKey>
     <MtouchArch>ARMv7, ARM64</MtouchArch>
     <MtouchLink>None</MtouchLink>
     <IpaPackageName>
     </IpaPackageName>
+    <CodesignProvision>e83363e0-2a4d-4434-ab34-9fc5e894ac35</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>full</DebugType>
@@ -125,8 +126,6 @@
     <Compile Include="Song.cs" />
     <Compile Include="Songs.cs" />
     <Compile Include="MyMusicPlayer.cs" />
-    <Compile Include="ArtistSongTableViewSource.cs" />
-    <Compile Include="EmptyTableViewSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainStoryboard.storyboard" />
