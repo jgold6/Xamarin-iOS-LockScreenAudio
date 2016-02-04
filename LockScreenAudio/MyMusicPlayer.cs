@@ -161,7 +161,6 @@ namespace LockScreenAudio
 			np.ElapsedPlaybackTime = avPlayer.CurrentTime.Seconds;
 			SetNowPlayingInfo(((DetailViewController)dvc.Target).song, np);
 		}
-
 		#endregion
 
 		#region - Helper methods
