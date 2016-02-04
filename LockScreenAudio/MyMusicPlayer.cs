@@ -17,8 +17,42 @@ using System.Diagnostics;
 
 namespace LockScreenAudio
 {
+
 	public class MyMusicPlayer : NSObject
 	{
+		#region - EventHandlers
+		public event EventHandler EndReached;
+		public event EventHandler StartReached;
+		public event EventHandler ReadyToPlay;
+
+		protected virtual void OnEndReached(EventArgs e)
+		{
+			EventHandler handler = EndReached;
+			if (handler != null)
+			{
+				handler (this, e);
+			}
+		}
+
+		protected virtual void OnStartReached(EventArgs e)
+		{
+			EventHandler handler = StartReached;
+			if (handler != null)
+			{
+				handler (this, e);
+			}
+		}
+
+		protected virtual void OnReadyToPlay(EventArgs e)
+		{
+			EventHandler handler = ReadyToPlay;
+			if (handler != null)
+			{
+				handler (this, e);
+			}
+		}
+		#endregion
+
 		#region - Private instance variables
 		AVPlayer avPlayer = new AVPlayer();
 		float SEEK_RATE = 10.0f;
@@ -28,7 +62,7 @@ namespace LockScreenAudio
 		#endregion
 
 		#region - Public properties
-		public WeakReference dvc { get; set;}
+		public Song currentSong { get; set;} 
 
 		public float Rate { 
 			get {
@@ -41,9 +75,8 @@ namespace LockScreenAudio
 		#endregion
 
 		#region - Constructors
-		public MyMusicPlayer(WeakReference viewController)
+		public MyMusicPlayer()
 		{
-			dvc = viewController;
 			initSession();
 		}
 
@@ -62,16 +95,17 @@ namespace LockScreenAudio
 			avPlayer.AddPeriodicTimeObserver(CMTime.FromSeconds(5.0, 1), DispatchQueue.MainQueue, delegate(CMTime time) {
 				Console.WriteLine("Seconds: {0}, Value: {1}", time.Seconds, time.Value);
 
-				if (time.Seconds >= avPlayer.CurrentItem.Duration.Seconds -1.0) {
-					((DetailViewController)dvc.Target).PlayNextSong();
+				EventArgs args = new EventArgs();
+				if (time.Seconds >= avPlayer.CurrentItem.Duration.Seconds -1.0)  {
+					OnEndReached(args);
 				}
 				else if (avPlayer.Rate > 1.0f && time.Seconds >= avPlayer.CurrentItem.Duration.Seconds -6.0) {
 					avPlayer.Rate = 1.0f;
-					((DetailViewController)dvc.Target).PlayNextSong();
+					OnEndReached(args);
 				}
 				else if (avPlayer.Rate < 0 && time.Seconds <= 6.0) {
 					avPlayer.Rate = 1.0f;
-					((DetailViewController)dvc.Target).PlayPrevSong();
+					OnStartReached(args);
 				}
 			});
 		}
@@ -81,6 +115,7 @@ namespace LockScreenAudio
 		// Play song from persistentSongID
 		public void playSong(Song song)
 		{
+			currentSong = song;
 			if (song.streamingURL == null) {
 				MusicQuery musicQuery = new MusicQuery();
 				MPMediaItem mediaItem = musicQuery.queryForSongWithId(song.songID);
@@ -108,12 +143,12 @@ namespace LockScreenAudio
 		{
 			Console.WriteLine("Status Observed Method {0}", avPlayer.Status);
 			if (avPlayer.Status == AVPlayerStatus.ReadyToPlay) {
-				if (dvc != null) {
-					((DetailViewController)dvc.Target).enablePlayPauseButton ();
+				if (currentSong != null) {
+					OnReadyToPlay (new EventArgs());
 
-					((DetailViewController)dvc.Target).song.duration = streamingItem.Duration.Seconds;
+					currentSong.duration = streamingItem.Duration.Seconds;
 					MPNowPlayingInfo np = new MPNowPlayingInfo ();
-					SetNowPlayingInfo (((DetailViewController)dvc.Target).song, np);
+					SetNowPlayingInfo (currentSong, np);
 					this.play ();
 				}
 			}
@@ -159,7 +194,7 @@ namespace LockScreenAudio
 				np.PlaybackRate = 1.0f;
 			}
 			np.ElapsedPlaybackTime = avPlayer.CurrentTime.Seconds;
-			SetNowPlayingInfo(((DetailViewController)dvc.Target).song, np);
+			SetNowPlayingInfo(currentSong, np);
 		}
 		#endregion
 

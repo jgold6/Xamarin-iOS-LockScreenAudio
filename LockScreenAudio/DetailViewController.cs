@@ -72,8 +72,10 @@ namespace LockScreenAudio
 		{
 			base.ViewDidAppear(animated);
 			// Create and initialize music player
-			WeakReference dvc = new WeakReference(this);
-			musicPlayer = new MyMusicPlayer(dvc);
+			musicPlayer = new MyMusicPlayer();
+			musicPlayer.EndReached += MusicPlayer_PlayNextSong;
+			musicPlayer.StartReached += MusicPlayer_PlayPrevSong;
+			musicPlayer.ReadyToPlay += MusicPlayer_EnablePlayPauseButton;
 			// Play song (and load all songs by artist to player queue)
 			if (song.streamingURL == null) {
 				actIndView.StopAnimating();
@@ -95,6 +97,21 @@ namespace LockScreenAudio
 			this.BecomeFirstResponder();
 		}
 
+		void MusicPlayer_PlayNextSong (object sender, EventArgs e)
+		{
+			PlayNextSong ();
+		}
+
+		void MusicPlayer_PlayPrevSong (object sender, EventArgs e)
+		{
+			PlayPrevSong ();
+		}
+
+		void MusicPlayer_EnablePlayPauseButton (object sender, EventArgs e)
+		{
+			EnablePlayPauseButton ();
+		}
+
 		public override void ViewWillDisappear(bool animated)
 		{
 			base.ViewWillDisappear(animated);
@@ -107,8 +124,10 @@ namespace LockScreenAudio
 			this.NavigationController.NavigationBar.BackgroundColor = UIColor.White;
 			this.NavigationController.NavigationBar.BarTintColor = UIColor.White;
 			this.NavigationController.NavigationBar.TintColor = systemNavBarTintColor;
-			// Clear the music players reference back to this class - avoid retain cycle
-			musicPlayer.dvc = null;
+
+			musicPlayer.EndReached -= MusicPlayer_PlayNextSong;
+			musicPlayer.StartReached -= MusicPlayer_PlayPrevSong;
+			musicPlayer.ReadyToPlay -= MusicPlayer_EnablePlayPauseButton;
 		}
 
 		public override bool CanBecomeFirstResponder
@@ -242,7 +261,7 @@ namespace LockScreenAudio
 
 		}
 
-		public void enablePlayPauseButton()
+		public void EnablePlayPauseButton()
 		{
 			playPause.UserInteractionEnabled = true;
 			playPause.TintColor = UIColor.Blue;

@@ -1,14 +1,8 @@
 ﻿<Properties GitUserInfo="UsingMD" StartupItem="LockScreenAudio/LockScreenAudio.csproj">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhone" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneDeviceTarget.Johnny Golds iPhone 5s" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="LockScreenAudio/MasterViewController.cs">
-    <Files>
-      <File FileName="LockScreenAudio/MasterViewController.cs" Line="85" Column="28" />
-    </Files>
-  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|iPhone" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneDeviceTarget.Johnny Golds iPhone 5s" />
+  <MonoDevelop.Ide.Workbench />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/Users/apple/git/Xamarin-iOS-LockScreenAudio/LockScreenAudio/MasterViewController.cs" line="237" column="1" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>
