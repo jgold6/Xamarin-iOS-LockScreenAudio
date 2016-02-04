@@ -144,6 +144,7 @@ namespace LockScreenAudio
 		// Forward remote control received events, from the lock or control screen, to the music player.
 		public override void RemoteControlReceived(UIEvent theEvent)
 		{
+			base.RemoteControlReceived(theEvent);
 			if (theEvent.Subtype == UIEventSubtype.RemoteControlPreviousTrack) {
 				PlayPrevSong();
 			}
@@ -151,7 +152,6 @@ namespace LockScreenAudio
 				PlayNextSong();
 			}
 			else {
-				base.RemoteControlReceived(theEvent);
 				musicPlayer.RemoteControlReceived(theEvent);
 			}
 		}

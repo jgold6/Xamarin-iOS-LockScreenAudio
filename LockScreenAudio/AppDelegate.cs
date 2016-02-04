@@ -23,13 +23,6 @@ namespace LockScreenAudio
 			set;
 		}
 
-		public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
-		{
-
-			Console.WriteLine ("FinishedLaunching");
-			return true;
-		}
-
 		//
 		// This method is invoked when the application is about to move from active to inactive state.
 		//

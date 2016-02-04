@@ -108,12 +108,14 @@ namespace LockScreenAudio
 		{
 			Console.WriteLine("Status Observed Method {0}", avPlayer.Status);
 			if (avPlayer.Status == AVPlayerStatus.ReadyToPlay) {
-				dvc.enablePlayPauseButton();
+				if (dvc != null) {
+					dvc.enablePlayPauseButton ();
 
-				dvc.song.duration = streamingItem.Duration.Seconds;
-				MPNowPlayingInfo np = new MPNowPlayingInfo();
-				SetNowPlayingInfo(dvc.song, np);
-				this.play();
+					dvc.song.duration = streamingItem.Duration.Seconds;
+					MPNowPlayingInfo np = new MPNowPlayingInfo ();
+					SetNowPlayingInfo (dvc.song, np);
+					this.play ();
+				}
 			}
 			else if (avPlayer.Status == AVPlayerStatus.Failed) {
 				Console.WriteLine("Stream Failed");
