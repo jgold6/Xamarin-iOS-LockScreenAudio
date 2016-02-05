@@ -54,11 +54,12 @@ namespace LockScreenAudio
 		#endregion
 
 		#region - Private instance variables
-		AVPlayer avPlayer = new AVPlayer();
+		AVPlayer avPlayer;
 		float SEEK_RATE = 10.0f;
-		private AVPlayerItem item;
-		private AVPlayerItem streamingItem;
-
+		AVPlayerItem item;
+		AVPlayerItem streamingItem;
+		static MyMusicPlayer myMusicPlayer;
+		NSObject timeObserver;
 		#endregion
 
 		#region - Public properties
@@ -66,23 +67,54 @@ namespace LockScreenAudio
 
 		public float Rate { 
 			get {
-				return avPlayer.Rate;
-			}
-			set {
-				avPlayer.Rate = value;
+				return avPlayer != null ? avPlayer.Rate : 0.0f;
 			}
 		}
 		#endregion
 
 		#region - Constructors
-		public MyMusicPlayer()
+		private MyMusicPlayer()
 		{
 			initSession();
+		}
+
+		public static MyMusicPlayer GetInstance()
+		{
+			if (MyMusicPlayer.myMusicPlayer == null)
+				MyMusicPlayer.myMusicPlayer = new MyMusicPlayer ();
+			return MyMusicPlayer.myMusicPlayer;
+		}
+
+		public static void DestroyInstance()
+		{
+			if (MyMusicPlayer.myMusicPlayer.item != null) {
+				MyMusicPlayer.myMusicPlayer.item.Dispose ();
+				MyMusicPlayer.myMusicPlayer.item = null;
+			}
+			if (MyMusicPlayer.myMusicPlayer.streamingItem != null) {
+				MyMusicPlayer.myMusicPlayer.streamingItem.RemoveObserver (MyMusicPlayer.myMusicPlayer, "status");
+				MyMusicPlayer.myMusicPlayer.streamingItem.Dispose ();
+				MyMusicPlayer.myMusicPlayer.streamingItem = null;
+			}
+			if (MyMusicPlayer.myMusicPlayer.avPlayer != null) {
+				MyMusicPlayer.myMusicPlayer.avPlayer.RemoveTimeObserver (MyMusicPlayer.myMusicPlayer.timeObserver);
+				MyMusicPlayer.myMusicPlayer.avPlayer.Dispose ();
+				MyMusicPlayer.myMusicPlayer.avPlayer = null;
+			}
+			if (MyMusicPlayer.myMusicPlayer.timeObserver != null) {
+				MyMusicPlayer.myMusicPlayer.timeObserver.Dispose ();
+				MyMusicPlayer.myMusicPlayer.timeObserver = null;
+			}
+			if (MyMusicPlayer.myMusicPlayer != null) {
+				MyMusicPlayer.myMusicPlayer.Dispose ();
+				MyMusicPlayer.myMusicPlayer = null;
+			}
 		}
 
 		// Initialize audio session
 		void initSession()
 		{
+			avPlayer = new AVPlayer ();
 			AVAudioSession avSession = AVAudioSession.SharedInstance();
 
 			avSession.SetCategory(AVAudioSessionCategory.Playback);
@@ -92,22 +124,25 @@ namespace LockScreenAudio
 			if (activationError != null)
 				Console.WriteLine("Could not activate audio session {0}", activationError.LocalizedDescription);
 			avPlayer.ActionAtItemEnd = AVPlayerActionAtItemEnd.None;
-			avPlayer.AddPeriodicTimeObserver(CMTime.FromSeconds(5.0, 1), DispatchQueue.MainQueue, delegate(CMTime time) {
-				Console.WriteLine("Seconds: {0}, Value: {1}", time.Seconds, time.Value);
+			timeObserver = avPlayer.AddPeriodicTimeObserver(CMTime.FromSeconds(5.0, 1), DispatchQueue.MainQueue, ObserveTime);
+		}
 
-				EventArgs args = new EventArgs();
-				if (time.Seconds >= avPlayer.CurrentItem.Duration.Seconds -1.0)  {
-					OnEndReached(args);
-				}
-				else if (avPlayer.Rate > 1.0f && time.Seconds >= avPlayer.CurrentItem.Duration.Seconds -6.0) {
-					avPlayer.Rate = 1.0f;
-					OnEndReached(args);
-				}
-				else if (avPlayer.Rate < 0 && time.Seconds <= 6.0) {
-					avPlayer.Rate = 1.0f;
-					OnStartReached(args);
-				}
-			});
+		public void ObserveTime(CMTime time)
+		{
+			Console.WriteLine("Seconds: {0}, Value: {1}", time.Seconds, time.Value);
+
+			EventArgs args = new EventArgs();
+			if (time.Seconds >= avPlayer.CurrentItem.Duration.Seconds -1.0)  {
+				OnEndReached(args);
+			}
+			else if (avPlayer.Rate > 1.0f && time.Seconds >= avPlayer.CurrentItem.Duration.Seconds -6.0) {
+				avPlayer.Rate = 1.0f;
+				OnEndReached(args);
+			}
+			else if (avPlayer.Rate < 0 && time.Seconds <= 6.0) {
+				avPlayer.Rate = 1.0f;
+				OnStartReached(args);
+			}
 		}
 		#endregion
 

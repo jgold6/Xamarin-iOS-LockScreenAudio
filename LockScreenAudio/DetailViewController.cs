@@ -66,13 +66,18 @@ namespace LockScreenAudio
 			this.NavigationController.NavigationBar.BarTintColor = UIColor.DarkGray;
 			systemNavBarTintColor = this.NavigationController.NavigationBar.TintColor;
 			this.NavigationController.NavigationBar.TintColor = UIColor.LightGray;
+
+			actIndView.StartAnimating();
+			actIndView.Hidden = false;
+			playPause.UserInteractionEnabled = false;
+			playPause.TintColor = UIColor.DarkGray;
 		}
 
 		public override void ViewDidAppear(bool animated)
 		{
 			base.ViewDidAppear(animated);
 			// Create and initialize music player
-			musicPlayer = new MyMusicPlayer();
+			musicPlayer = MyMusicPlayer.GetInstance ();
 			musicPlayer.EndReached += MusicPlayer_PlayNextSong;
 			musicPlayer.StartReached += MusicPlayer_PlayPrevSong;
 			musicPlayer.ReadyToPlay += MusicPlayer_EnablePlayPauseButton;
@@ -82,12 +87,6 @@ namespace LockScreenAudio
 				actIndView.Hidden = true;
 				playPause.UserInteractionEnabled = true;
 				playPause.TintColor = UIColor.Blue;
-			}
-			else {
-				actIndView.StartAnimating();
-				actIndView.Hidden = false;
-				playPause.UserInteractionEnabled = false;
-				playPause.TintColor = UIColor.DarkGray;
 			}
 			musicPlayer.playSong(song);
 			SetPrevNextButtonStatus();
@@ -112,24 +111,33 @@ namespace LockScreenAudio
 			EnablePlayPauseButton ();
 		}
 
-		public override void ViewWillDisappear(bool animated)
+		public override void ViewWillDisappear (bool animated)
 		{
-			base.ViewWillDisappear(animated);
-			actIndView.StopAnimating();
-			actIndView.Hidden = true;
+			base.ViewWillDisappear (animated);
 			musicPlayer.pause();
+
 			// Unregister for control events
 			UIApplication.SharedApplication.EndReceivingRemoteControlEvents();
 			this.ResignFirstResponder();
 			this.NavigationController.NavigationBar.BackgroundColor = UIColor.White;
 			this.NavigationController.NavigationBar.BarTintColor = UIColor.White;
 			this.NavigationController.NavigationBar.TintColor = systemNavBarTintColor;
+		}
+
+		public override void ViewDidDisappear(bool animated)
+		{
+			base.ViewDidDisappear(animated);
+
+			actIndView.StopAnimating();
+			actIndView.Hidden = true;
 
 			musicPlayer.EndReached -= MusicPlayer_PlayNextSong;
 			musicPlayer.StartReached -= MusicPlayer_PlayPrevSong;
 			musicPlayer.ReadyToPlay -= MusicPlayer_EnablePlayPauseButton;
-		}
+			MyMusicPlayer.DestroyInstance ();
 
+		}
+			
 		public override bool CanBecomeFirstResponder
 		{
 			get
