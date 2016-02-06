@@ -207,6 +207,9 @@ namespace LockScreenAudio
 				song = currentSongList[currentSongIndex];
 				musicPlayer.playSong(song);
 				DisplaySongInfo();
+				if (song.streamingURL != null) {
+					disableAllButtons ();
+				}
 			}
 		}
 
@@ -217,6 +220,9 @@ namespace LockScreenAudio
 				song = currentSongList[currentSongIndex];
 				musicPlayer.playSong(song);
 				DisplaySongInfo();
+				if (song.streamingURL != null) {
+					disableAllButtons ();
+				}
 			}
 		}
 
@@ -274,6 +280,20 @@ namespace LockScreenAudio
 			playPause.SetTitle("Pause", UIControlState.Normal);
 			actIndView.StopAnimating();
 			actIndView.Hidden = true;
+			setPrevNextButtonStatus ();
+		}
+
+		void disableAllButtons()
+		{
+			prevBtn.UserInteractionEnabled = false;
+			prevBtn.TintColor = UIColor.DarkGray;
+			nextBtn.UserInteractionEnabled = false;
+			nextBtn.TintColor = UIColor.DarkGray;
+			actIndView.StartAnimating();
+			actIndView.Hidden = false;
+			playPause.UserInteractionEnabled = false;
+			playPause.TintColor = UIColor.DarkGray;
+
 		}
 
 		#endregion
