@@ -20,7 +20,9 @@ namespace LockScreenAudio
 		private UISearchBar searchBar;
 		private UISearchDisplayController searchController;
 		private UIBarButtonItem leftBBI;
+		private UIBarButtonItem rightBBI;
 		private bool loading;
+		private DetailViewController detailViewController;
 
 		#region - Constructors
 		public MasterViewController(IntPtr handle) : base(handle)
@@ -45,6 +47,8 @@ namespace LockScreenAudio
 			base.ViewDidLoad();
 			leftBBI = new UIBarButtonItem("Stream a song", UIBarButtonItemStyle.Bordered, this, new Selector("StreamSong:"));
 			NavigationItem.LeftBarButtonItem = leftBBI;
+			rightBBI = new UIBarButtonItem("Now Playing", UIBarButtonItemStyle.Bordered, this, new Selector("NowPlaying:"));
+			NavigationItem.RightBarButtonItem = rightBBI;
 			TableView.SectionIndexTrackingBackgroundColor = UIColor.FromRGB(0.9f, 0.9f, 0.9f);
 
 			loading = true;
@@ -55,7 +59,7 @@ namespace LockScreenAudio
 			base.ViewDidAppear(animated);
 			if (searchBar == null) {
 				Songs.querySongs();
-				this.Title = String.Format("Songs ({0}) by Artist ({1})", Songs.songCount, Songs.artistCount);
+				this.Title = String.Format("Songs");
 
 				searchBar = new UISearchBar(new CGRect (0, 0, 320, 44)) {
 					Placeholder = "Search",
@@ -75,6 +79,17 @@ namespace LockScreenAudio
 				TableView.ReloadData();
 				searchBar.UserInteractionEnabled = true;
 			}
+			// Register for receiving controls from lock screen and controlscreen
+			UIApplication.SharedApplication.BeginReceivingRemoteControlEvents();
+			this.BecomeFirstResponder ();
+		}
+
+		public override void ViewWillDisappear (bool animated)
+		{
+			base.ViewWillDisappear (animated);
+			// Unregister for control events
+			UIApplication.SharedApplication.EndReceivingRemoteControlEvents();
+			this.ResignFirstResponder();
 		}
 
 		// Get ready to segue to the detail view controller
@@ -82,7 +97,7 @@ namespace LockScreenAudio
 		{
 			// The segue to use
 			if (segue.Identifier == "showDetail") {
-				DetailViewController detailVC = segue.DestinationViewController as DetailViewController;
+				detailViewController = segue.DestinationViewController as DetailViewController;
 				if (sender == leftBBI) {
 					Song song = new Song();
 					song.song = "Crocodile Tears";
@@ -91,7 +106,12 @@ namespace LockScreenAudio
 					song.duration = 232.0;
 					song.streamingURL = "http://johnnygold.com/music/croctears.mp3";
 					// Pass song info to the detail view controller
-					detailVC.song = song;
+					detailViewController.song = song;
+				}
+				else if (sender == rightBBI) {
+					// do nothing
+					Song playingSong = MyMusicPlayer.GetInstance ().currentSong;
+					detailViewController.song = playingSong;
 				}
 				else {
 					// Selected song
@@ -99,7 +119,7 @@ namespace LockScreenAudio
 					Song song = Songs.GetSongBySectionRow(indexPath.Section, indexPath.Row);
 					song.streamingURL = null;
 					// Pass song info to the detail view controller
-					detailVC.song = song;
+					detailViewController.song = song;
 				}
 			}
 		}
@@ -111,6 +131,24 @@ namespace LockScreenAudio
 
 		#endregion
 
+		#region - Handle events from outside the app
+		// Forward remote control received events, from the lock or control screen, to the music player.
+		public override void RemoteControlReceived(UIEvent theEvent)
+		{
+			base.RemoteControlReceived(theEvent);
+			if (theEvent.Subtype == UIEventSubtype.RemoteControlPreviousTrack) {
+				detailViewController.PlayPrevSong();
+			}
+			else if (theEvent.Subtype == UIEventSubtype.RemoteControlNextTrack) {
+				detailViewController.PlayNextSong();
+			}
+			else {
+				detailViewController.musicPlayer.RemoteControlReceived(theEvent);
+			}
+		}
+		#endregion
+
+
 		#region - class helper methods
 		[Export("StreamSong:")]
 		public void StreamSong(UIBarButtonItem sender)
@@ -118,6 +156,11 @@ namespace LockScreenAudio
 			PerformSegue("showDetail", sender);
 		}
 
+		[Export("NowPlaying:")]
+		public void NowPlaying(UIBarButtonItem sender)
+		{
+			PerformSegue("showDetail", sender);
+		}
 		#endregion
 
 		#region - Table View data source overrides

@@ -54,7 +54,7 @@ namespace LockScreenAudio
 		#endregion
 
 		#region - Private instance variables
-		AVPlayer avPlayer;
+		public AVPlayer avPlayer { get; private set;}
 		float SEEK_RATE = 10.0f;
 		AVPlayerItem item;
 		AVPlayerItem streamingItem;
@@ -83,32 +83,6 @@ namespace LockScreenAudio
 			if (MyMusicPlayer.myMusicPlayer == null)
 				MyMusicPlayer.myMusicPlayer = new MyMusicPlayer ();
 			return MyMusicPlayer.myMusicPlayer;
-		}
-
-		public static void DestroyInstance()
-		{
-			if (MyMusicPlayer.myMusicPlayer.item != null) {
-				MyMusicPlayer.myMusicPlayer.item.Dispose ();
-				MyMusicPlayer.myMusicPlayer.item = null;
-			}
-			if (MyMusicPlayer.myMusicPlayer.streamingItem != null) {
-				MyMusicPlayer.myMusicPlayer.streamingItem.RemoveObserver (MyMusicPlayer.myMusicPlayer, "status");
-				MyMusicPlayer.myMusicPlayer.streamingItem.Dispose ();
-				MyMusicPlayer.myMusicPlayer.streamingItem = null;
-			}
-			if (MyMusicPlayer.myMusicPlayer.avPlayer != null) {
-				MyMusicPlayer.myMusicPlayer.avPlayer.RemoveTimeObserver (MyMusicPlayer.myMusicPlayer.timeObserver);
-				MyMusicPlayer.myMusicPlayer.avPlayer.Dispose ();
-				MyMusicPlayer.myMusicPlayer.avPlayer = null;
-			}
-			if (MyMusicPlayer.myMusicPlayer.timeObserver != null) {
-				MyMusicPlayer.myMusicPlayer.timeObserver.Dispose ();
-				MyMusicPlayer.myMusicPlayer.timeObserver = null;
-			}
-			if (MyMusicPlayer.myMusicPlayer != null) {
-				MyMusicPlayer.myMusicPlayer.Dispose ();
-				MyMusicPlayer.myMusicPlayer = null;
-			}
 		}
 
 		// Initialize audio session
@@ -190,6 +164,7 @@ namespace LockScreenAudio
 			else if (avPlayer.Status == AVPlayerStatus.Failed) {
 				Console.WriteLine("Stream Failed");
 			}
+			MyMusicPlayer.myMusicPlayer.streamingItem.RemoveObserver (MyMusicPlayer.myMusicPlayer, "status");
 		}
 
 		public void pause()

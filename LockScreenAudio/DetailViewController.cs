@@ -44,13 +44,25 @@ namespace LockScreenAudio
 		{
 			base.ViewDidLoad();
 
+			// Create and initialize music player
+			musicPlayer = MyMusicPlayer.GetInstance ();
+			musicPlayer.EndReached -= MusicPlayer_PlayNextSong;
+			musicPlayer.StartReached -= MusicPlayer_PlayPrevSong;
+			musicPlayer.ReadyToPlay -= MusicPlayer_EnablePlayPauseButton;
+			musicPlayer.EndReached += MusicPlayer_PlayNextSong;
+			musicPlayer.StartReached += MusicPlayer_PlayPrevSong;
+			musicPlayer.ReadyToPlay += MusicPlayer_EnablePlayPauseButton;
+
 			// set up handler for when app resumes from background
 			NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("resumeFromBackground"), UIApplication.DidBecomeActiveNotification, null);
+			// Register for receiving controls from lock screen and controlscreen
+			UIApplication.SharedApplication.BeginReceivingRemoteControlEvents();
 		}
 
 		public override void ViewWillAppear(bool animated)
 		{
 			base.ViewWillAppear(animated);
+
 			if (song.streamingURL != null) {
 				currentSongList = new List<Song>(){song};
 				currentSongCount = 1;
@@ -67,32 +79,28 @@ namespace LockScreenAudio
 			systemNavBarTintColor = this.NavigationController.NavigationBar.TintColor;
 			this.NavigationController.NavigationBar.TintColor = UIColor.LightGray;
 
-			actIndView.StartAnimating();
-			actIndView.Hidden = false;
-			playPause.UserInteractionEnabled = false;
-			playPause.TintColor = UIColor.DarkGray;
+			if (musicPlayer.currentSong == null ){
+				actIndView.StartAnimating();
+				actIndView.Hidden = false;
+				playPause.UserInteractionEnabled = false;
+				playPause.TintColor = UIColor.DarkGray;
+			}
+			if (song.streamingURL == null || musicPlayer.avPlayer.CurrentItem != null) {
+				actIndView.Hidden = true;
+				actIndView.StopAnimating();
+				playPause.UserInteractionEnabled = true;
+				playPause.TintColor = UIColor.Blue;
+			}
 		}
 
 		public override void ViewDidAppear(bool animated)
 		{
 			base.ViewDidAppear(animated);
-			// Create and initialize music player
-			musicPlayer = MyMusicPlayer.GetInstance ();
-			musicPlayer.EndReached += MusicPlayer_PlayNextSong;
-			musicPlayer.StartReached += MusicPlayer_PlayPrevSong;
-			musicPlayer.ReadyToPlay += MusicPlayer_EnablePlayPauseButton;
 			// Play song (and load all songs by artist to player queue)
-			if (song.streamingURL == null) {
-				actIndView.StopAnimating();
-				actIndView.Hidden = true;
-				playPause.UserInteractionEnabled = true;
-				playPause.TintColor = UIColor.Blue;
-			}
-			musicPlayer.playSong(song);
+			if (musicPlayer.currentSong != song)
+				musicPlayer.playSong(song);
 			SetPrevNextButtonStatus();
 
-			// Register for receiving controls from lock screen and controlscreen
-			UIApplication.SharedApplication.BeginReceivingRemoteControlEvents();
 			this.BecomeFirstResponder();
 		}
 
@@ -114,7 +122,6 @@ namespace LockScreenAudio
 		public override void ViewWillDisappear (bool animated)
 		{
 			base.ViewWillDisappear (animated);
-			musicPlayer.pause();
 
 			// Unregister for control events
 			UIApplication.SharedApplication.EndReceivingRemoteControlEvents();
@@ -124,20 +131,6 @@ namespace LockScreenAudio
 			this.NavigationController.NavigationBar.TintColor = systemNavBarTintColor;
 		}
 
-		public override void ViewDidDisappear(bool animated)
-		{
-			base.ViewDidDisappear(animated);
-
-			actIndView.StopAnimating();
-			actIndView.Hidden = true;
-
-			musicPlayer.EndReached -= MusicPlayer_PlayNextSong;
-			musicPlayer.StartReached -= MusicPlayer_PlayPrevSong;
-			musicPlayer.ReadyToPlay -= MusicPlayer_EnablePlayPauseButton;
-			MyMusicPlayer.DestroyInstance ();
-
-		}
-			
 		public override bool CanBecomeFirstResponder
 		{
 			get
@@ -273,6 +266,7 @@ namespace LockScreenAudio
 		{
 			playPause.UserInteractionEnabled = true;
 			playPause.TintColor = UIColor.Blue;
+			playPause.SetTitle("Pause", UIControlState.Normal);
 			actIndView.StopAnimating();
 			actIndView.Hidden = true;
 		}
