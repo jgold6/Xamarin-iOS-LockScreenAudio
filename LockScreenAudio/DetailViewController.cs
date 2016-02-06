@@ -99,7 +99,8 @@ namespace LockScreenAudio
 			// Play song (and load all songs by artist to player queue)
 			if (musicPlayer.currentSong != song)
 				musicPlayer.playSong(song);
-			SetPrevNextButtonStatus();
+			setPrevNextButtonStatus();
+			setPlayPauseButtonStatus ();
 
 			this.BecomeFirstResponder();
 		}
@@ -149,13 +150,7 @@ namespace LockScreenAudio
 		[Export("resumeFromBackground")]
 		public void resumeFromBackGround()
 		{
-			if (musicPlayer.Rate > 0.0f) {
-				playPause.SetTitle("Pause", UIControlState.Normal);
-			}
-			else 
-			{
-				playPause.SetTitle("Play", UIControlState.Normal);
-			}
+			setPlayPauseButtonStatus ();
 			if (song.streamingURL == null) {
 				currentSongIndex = Songs.GetIndexOfSongByArtist(song);
 				DisplaySongInfo();
@@ -184,13 +179,12 @@ namespace LockScreenAudio
 		{
 			if (musicPlayer.Rate > 0.0f) {
 				musicPlayer.pause();
-				sender.SetTitle("Play", UIControlState.Normal);
 			}
 			else 
 			{
 				musicPlayer.play();
-				sender.SetTitle("Pause", UIControlState.Normal);
 			}
+			setPlayPauseButtonStatus ();
 		}
 
 		partial void prevButtonTapped(UIButton sender)
@@ -236,13 +230,13 @@ namespace LockScreenAudio
 			if (song.artwork != null)
 				artworkView.Image = song.artwork.ImageWithSize(new CGSize(115.0f, 115.0f));
 			this.NavigationItem.Title = String.Format("Playing song {0} of {1}", currentSongIndex + 1, currentSongCount);
-			SetPrevNextButtonStatus();
+			setPrevNextButtonStatus();
 			if (musicPlayer != null) {
 				playPause.SetTitle(musicPlayer.Rate > 0.0f ? "Pause" : "Play", UIControlState.Normal);
 			}
 		}
 
-		public void SetPrevNextButtonStatus() {
+		void setPrevNextButtonStatus() {
 			if (currentSongIndex == 0) {
 				prevBtn.UserInteractionEnabled = false;
 				prevBtn.TintColor = UIColor.DarkGray;
@@ -260,6 +254,17 @@ namespace LockScreenAudio
 				nextBtn.TintColor = UIColor.Blue;
 			}
 
+		}
+
+		void setPlayPauseButtonStatus ()
+		{
+			if (musicPlayer.Rate > 0.0f) {
+				playPause.SetTitle("Pause", UIControlState.Normal);
+			}
+			else 
+			{
+				playPause.SetTitle("Play", UIControlState.Normal);
+			}
 		}
 
 		public void EnablePlayPauseButton()
