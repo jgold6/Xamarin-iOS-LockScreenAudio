@@ -64,9 +64,9 @@ namespace LockScreenAudio
 			base.ViewWillAppear(animated);
 
 			if (song.streamingURL != null) {
-				currentSongList = new List<Song>(){song};
-				currentSongCount = 1;
-				currentSongIndex = 0;
+				currentSongList = Songs.GetStreamingSongs ();
+				currentSongCount = currentSongList.Count;
+				currentSongIndex = Songs.GetIndexOfStreamingSong (song);
 			}
 			else {
 				currentSongList = Songs.GetSongsByArtist(song.artist);

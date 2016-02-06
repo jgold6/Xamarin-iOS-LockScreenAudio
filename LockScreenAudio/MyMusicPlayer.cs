@@ -141,9 +141,10 @@ namespace LockScreenAudio
 			}
 			else {
 				NSUrl nsUrl = NSUrl.FromString(song.streamingURL);
+				MyMusicPlayer.myMusicPlayer?.streamingItem?.RemoveObserver (MyMusicPlayer.myMusicPlayer, "status");
 				streamingItem = AVPlayerItem.FromUrl(nsUrl);
+				streamingItem.AddObserver(this, new NSString("status"), NSKeyValueObservingOptions.OldNew, avPlayer.Handle);
 				avPlayer.ReplaceCurrentItemWithPlayerItem(streamingItem);
-				streamingItem.AddObserver(this, new NSString("status"), NSKeyValueObservingOptions.New, avPlayer.Handle);
 				//NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("playerItemDidReachEnd:"), AVPlayerItem.DidPlayToEndTimeNotification, streamingItem);
 			}
 		}
@@ -153,18 +154,17 @@ namespace LockScreenAudio
 			Console.WriteLine("Status Observed Method {0}", avPlayer.Status);
 			if (avPlayer.Status == AVPlayerStatus.ReadyToPlay) {
 				if (currentSong != null) {
-					OnReadyToPlay (new EventArgs());
-
 					currentSong.duration = streamingItem.Duration.Seconds;
 					MPNowPlayingInfo np = new MPNowPlayingInfo ();
 					SetNowPlayingInfo (currentSong, np);
 					this.play ();
+
+					OnReadyToPlay (new EventArgs());
 				}
 			}
 			else if (avPlayer.Status == AVPlayerStatus.Failed) {
 				Console.WriteLine("Stream Failed");
 			}
-			MyMusicPlayer.myMusicPlayer.streamingItem.RemoveObserver (MyMusicPlayer.myMusicPlayer, "status");
 		}
 
 		public void pause()

@@ -16,6 +16,8 @@ namespace LockScreenAudio
 		public static int searchSongCount { get; private set;}
 		public static int searchArtistCount { get; private set;}
 
+		static List<Song> streamingSongs;
+
 		public static bool searching = false;
 
 		// Get the songs from the music library
@@ -150,6 +152,113 @@ namespace LockScreenAudio
 				searchSongCount += songs.Count;
 			}
 		}
+
+		public static List<Song> GetStreamingSongs()
+		{
+			if (streamingSongs == null)
+				setUpStreamingSongs ();
+			return streamingSongs;
+		}
+
+		public static int GetIndexOfStreamingSong (Song song)
+		{
+			if (streamingSongs == null)
+				setUpStreamingSongs ();
+			return streamingSongs.IndexOf (song);
+		}
+
+		public static Song GetStreamingSongByIndex(int index)
+		{
+			if (streamingSongs == null)
+				setUpStreamingSongs ();
+			return streamingSongs [index];
+		}
+
+		static void setUpStreamingSongs()
+		{
+			streamingSongs = new List<Song>();
+
+			Song song = new Song();
+			song.song = "Crocodile Tears";
+			song.album = "Johnny Gold";
+			song.artist = "Johnny Gold";
+			song.duration = 232.0;
+			song.streamingURL = "http://johnnygold.com/music/croctears.mp3";
+			streamingSongs.Add (song);
+
+			song = new Song();
+			song.song = "912";
+			song.album = "Johnny Gold";
+			song.artist = "Johnny Gold";
+			song.duration = 257.0;
+			song.streamingURL = "http://johnnygold.com/music/ninetwelve.mp3";
+			streamingSongs.Add (song);
+
+			song = new Song();
+			song.song = "Summertime";
+			song.album = "Johnny Gold";
+			song.artist = "Johnny Gold";
+			song.duration = 196.0;
+			song.streamingURL = "http://johnnygold.com/music/summertime.mp3";
+			streamingSongs.Add (song);
+
+			song = new Song();
+			song.song = "Mystery";
+			song.album = "Johnny Gold";
+			song.artist = "Johnny Gold";
+			song.duration = 219.0;
+			song.streamingURL = "http://johnnygold.com/music/mystery.mp3";
+			streamingSongs.Add (song);
+
+			song = new Song();
+			song.song = "Mary Had a Little Lamb";
+			song.album = "Johnny Gold";
+			song.artist = "Johnny Gold";
+			song.duration = 302.0;
+			song.streamingURL = "http://johnnygold.com/music/maryhadalamb.mp3";
+			streamingSongs.Add (song);
+
+			song = new Song();
+			song.song = "Little Beach Blues";
+			song.album = "Johnny Gold";
+			song.artist = "Johnny Gold";
+			song.duration = 232.0;
+			song.streamingURL = "http://johnnygold.com/music/littlebeach.mp3";
+			streamingSongs.Add (song);
+
+			song = new Song();
+			song.song = "Stalking After Midnight";
+			song.album = "Johnny Gold";
+			song.artist = "Johnny Gold";
+			song.duration = 110.0;
+			song.streamingURL = "http://johnnygold.com/music/stalking.mp3";
+			streamingSongs.Add (song);
+
+			song = new Song();
+			song.song = "Misty Eyes";
+			song.album = "Johnny Gold";
+			song.artist = "Johnny Gold";
+			song.duration = 256.0;
+			song.streamingURL = "http://johnnygold.com/music/mistyeyes.mp3";
+			streamingSongs.Add (song);
+
+			song = new Song();
+			song.song = "Sunny Delight";
+			song.album = "Johnny Gold";
+			song.artist = "Johnny Gold";
+			song.duration = 302.0;
+			song.streamingURL = "http://johnnygold.com/music/sunnydelight.mp3";
+			streamingSongs.Add (song);
+
+			song = new Song();
+			song.song = "Silently Lying";
+			song.album = "Johnny Gold";
+			song.artist = "Johnny Gold";
+			song.duration = 232.0;
+			song.streamingURL = "http://johnnygold.com/music/silentlylying.mp3";
+			streamingSongs.Add (song);
+		}
+
 	}
 }
 

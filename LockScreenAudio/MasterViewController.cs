@@ -99,17 +99,11 @@ namespace LockScreenAudio
 			if (segue.Identifier == "showDetail") {
 				detailViewController = segue.DestinationViewController as DetailViewController;
 				if (sender == leftBBI) {
-					Song song = new Song();
-					song.song = "Crocodile Tears";
-					song.album = "Johnny Gold";
-					song.artist = "Johnny Gold";
-					song.duration = 232.0;
-					song.streamingURL = "http://johnnygold.com/music/croctears.mp3";
+					Song song = Songs.GetStreamingSongByIndex (0);
 					// Pass song info to the detail view controller
 					detailViewController.song = song;
 				}
 				else if (sender == rightBBI) {
-					// do nothing
 					Song playingSong = MyMusicPlayer.GetInstance ().currentSong;
 					detailViewController.song = playingSong;
 				}
@@ -159,7 +153,15 @@ namespace LockScreenAudio
 		[Export("NowPlaying:")]
 		public void NowPlaying(UIBarButtonItem sender)
 		{
-			PerformSegue("showDetail", sender);
+			if (MyMusicPlayer.GetInstance ().currentSong != null)
+				PerformSegue("showDetail", sender);
+			else {
+				UIAlertController ac = UIAlertController.Create ("No songs playing", "Please select a song to play", UIAlertControllerStyle.Alert);
+				UIAlertAction defaultAction = UIAlertAction.Create ("OK", UIAlertActionStyle.Cancel, null);
+				ac.AddAction (defaultAction);
+
+				PresentViewController	(ac, true, null);
+			}
 		}
 		#endregion
 
