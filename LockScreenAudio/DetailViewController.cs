@@ -69,9 +69,15 @@ namespace LockScreenAudio
 				currentSongIndex = Songs.GetIndexOfStreamingSong (song);
 			}
 			else {
-				currentSongList = Songs.GetSongsByArtist(song.artist);
-				currentSongCount = currentSongList.Count;
-				currentSongIndex = Songs.GetIndexOfSongByArtist(song);
+				if (Songs.searching) {
+					currentSongList = Songs.GetSearchedSongsByArtist (song.artist);
+					currentSongCount = currentSongList.Count;
+					currentSongIndex = Songs.GetSearchedIndexOfSongByArtist (song);
+				} else {
+					currentSongList = Songs.GetSongsByArtist (song.artist);
+					currentSongCount = currentSongList.Count;
+					currentSongIndex = Songs.GetIndexOfSongByArtist (song);
+				}
 			}
 			DisplaySongInfo();
 			this.NavigationController.NavigationBar.BackgroundColor = UIColor.DarkGray;

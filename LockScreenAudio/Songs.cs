@@ -52,6 +52,13 @@ namespace LockScreenAudio
 			return sba;
 		}
 
+		public static List<Song> GetSearchedSongsByArtist(string artistName)
+		{
+			List<Song> sba = new List<Song>();
+			searchResults.TryGetValue(artistName, out sba);
+			return sba;
+		}
+
 		public static List<Song> GetSongsByArtistIndex(int index)
 		{
 			if (searching) {
@@ -119,6 +126,19 @@ namespace LockScreenAudio
 			}
 			return 0;
 		}
+
+		public static int GetSearchedIndexOfSongByArtist(Song song)
+		{
+			int index = 0;
+			foreach (Song s in Songs.GetSearchedSongsByArtist(song.artist)) {
+				if (song.song == s.song)
+					return index;
+				else
+					index++;
+			}
+			return 0;
+		}
+
 
 		public static void FilterContentsForSearch(string str)
 		{
