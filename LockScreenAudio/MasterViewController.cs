@@ -148,6 +148,10 @@ namespace LockScreenAudio
 			else {
 				detailViewController.musicPlayer.RemoteControlReceived(theEvent);
 			}
+			if (!Songs.searching)
+				TableView.ReloadRows (TableView.IndexPathsForVisibleRows, UITableViewRowAnimation.None);
+			else
+				searchController.SearchResultsTableView.ReloadRows (searchController.SearchResultsTableView.IndexPathsForVisibleRows, UITableViewRowAnimation.None);
 		}
 		#endregion
 
