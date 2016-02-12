@@ -1,6 +1,7 @@
 ﻿// Loosely based on this guide: http://www.sagorin.org/ios-playing-audio-in-background-audio/
 // and sample in Obj-C: https://github.com/jsagorin/iOSBackgroundAudio
 
+
 using System;
 using CoreGraphics;
 using System.Collections.Generic;
