@@ -54,6 +54,15 @@ namespace LockScreenAudio
 			loading = true;
 		}
 
+		public override void ViewWillAppear (bool animated)
+		{
+			base.ViewWillAppear (animated);
+			if (!Songs.searching)
+				TableView.ReloadRows (TableView.IndexPathsForVisibleRows, UITableViewRowAnimation.None);
+			else
+				searchController.SearchResultsTableView.ReloadRows (searchController.SearchResultsTableView.IndexPathsForVisibleRows, UITableViewRowAnimation.None);
+		}
+
 		public override void ViewDidAppear(bool animated)
 		{
 			base.ViewDidAppear(animated);
@@ -314,6 +323,11 @@ namespace LockScreenAudio
 				Song song = Songs.GetSongBySectionRow (indexPath.Section, indexPath.Row);
 				cell.TextLabel.Text = song.song;
 				cell.DetailTextLabel.Text = String.Format ("Album: {0}", song.album);
+				if (song == MyMusicPlayer.GetInstance ().currentSong) {
+					cell.BackgroundColor = UIColor.FromRGB (0.9f, 0.9f, 0.9f);
+				} else {
+					cell.BackgroundColor = UIColor.White;
+				}
 			}
 
 			return cell;
