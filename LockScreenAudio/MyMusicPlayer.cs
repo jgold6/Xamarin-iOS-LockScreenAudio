@@ -143,7 +143,7 @@ namespace LockScreenAudio
 				NSUrl nsUrl = NSUrl.FromString(song.streamingURL);
 				MyMusicPlayer.myMusicPlayer?.streamingItem?.RemoveObserver (MyMusicPlayer.myMusicPlayer, "status");
 				streamingItem = AVPlayerItem.FromUrl(nsUrl);
-				streamingItem.AddObserver(this, new NSString("status"), NSKeyValueObservingOptions.OldNew, avPlayer.Handle);
+				streamingItem.AddObserver(this, new NSString("status"), NSKeyValueObservingOptions.New, avPlayer.Handle);
 				avPlayer.ReplaceCurrentItemWithPlayerItem(streamingItem);
 				//NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("playerItemDidReachEnd:"), AVPlayerItem.DidPlayToEndTimeNotification, streamingItem);
 			}
