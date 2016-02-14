@@ -151,19 +151,20 @@ namespace LockScreenAudio
 
 		public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
 		{
-			Console.WriteLine("Status Observed Method {0}", avPlayer.Status);
-			if (avPlayer.Status == AVPlayerStatus.ReadyToPlay) {
-				if (currentSong != null) {
-					currentSong.duration = streamingItem.Duration.Seconds;
-					MPNowPlayingInfo np = new MPNowPlayingInfo ();
-					SetNowPlayingInfo (currentSong, np);
-					this.play ();
-
-					OnReadyToPlay (new EventArgs());
+			if (keyPath.ToString () == "status") {
+				Console.WriteLine ("Status Observed Method {0}", avPlayer.Status);
+				if (avPlayer.Status == AVPlayerStatus.ReadyToPlay) {
+					if (currentSong != null) {
+						currentSong.duration = streamingItem.Duration.Seconds;
+						MPNowPlayingInfo np = new MPNowPlayingInfo ();
+						SetNowPlayingInfo (currentSong, np);
+						this.play ();
+				
+						OnReadyToPlay (new EventArgs ());
+					}
+				} else if (avPlayer.Status == AVPlayerStatus.Failed) {
+					Console.WriteLine ("Stream Failed");
 				}
-			}
-			else if (avPlayer.Status == AVPlayerStatus.Failed) {
-				Console.WriteLine("Stream Failed");
 			}
 		}
 
