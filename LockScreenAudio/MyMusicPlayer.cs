@@ -58,6 +58,7 @@ namespace LockScreenAudio
 		float SEEK_RATE = 10.0f;
 		AVPlayerItem item;
 		AVPlayerItem streamingItem;
+		bool streamingItemPaused;
 		static MyMusicPlayer myMusicPlayer;
 		NSObject timeObserver;
 		#endregion
@@ -88,6 +89,8 @@ namespace LockScreenAudio
 		// Initialize audio session
 		void initSession()
 		{
+			streamingItemPaused = false;
+
 			avPlayer = new AVPlayer ();
 			AVAudioSession avSession = AVAudioSession.SharedInstance();
 
@@ -145,6 +148,7 @@ namespace LockScreenAudio
 				streamingItem = AVPlayerItem.FromUrl(nsUrl);
 				streamingItem.AddObserver(this, new NSString("status"), NSKeyValueObservingOptions.New, avPlayer.Handle);
 				avPlayer.ReplaceCurrentItemWithPlayerItem(streamingItem);
+				streamingItemPaused = false;
 				//NSNotificationCenter.DefaultCenter.AddObserver(this, new Selector("playerItemDidReachEnd:"), AVPlayerItem.DidPlayToEndTimeNotification, streamingItem);
 			}
 		}
@@ -158,7 +162,8 @@ namespace LockScreenAudio
 						currentSong.duration = streamingItem.Duration.Seconds;
 						MPNowPlayingInfo np = new MPNowPlayingInfo ();
 						SetNowPlayingInfo (currentSong, np);
-						this.play ();
+						if (!streamingItemPaused)
+							this.play ();
 				
 						OnReadyToPlay (new EventArgs ());
 					}
@@ -170,11 +175,15 @@ namespace LockScreenAudio
 
 		public void pause()
 		{
+			if (currentSong.streamingURL != null)
+				streamingItemPaused = true;
 			this.avPlayer.Pause();
 		}
 
 		public void play()
 		{
+			if (currentSong.streamingURL != null)
+				streamingItemPaused = false;
 			this.avPlayer.Play();
 		}
 
@@ -183,10 +192,10 @@ namespace LockScreenAudio
 		{
 			MPNowPlayingInfo np = new MPNowPlayingInfo();
 			if (theEvent.Subtype == UIEventSubtype.RemoteControlPause) {
-				this.avPlayer.Pause();
+				pause();
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlPlay) {
-				this.avPlayer.Play();
+				play();
 			}
 			else if (theEvent.Subtype == UIEventSubtype.RemoteControlBeginSeekingForward) {
 				avPlayer.Rate = SEEK_RATE;
