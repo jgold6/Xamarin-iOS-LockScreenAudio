@@ -71,7 +71,7 @@
     <ConsolePause>false</ConsolePause>
     <CodesignKey>iPhone Developer: Jon Goldberger (NSCQB55JJ4)</CodesignKey>
     <MtouchArch>ARMv7, ARM64</MtouchArch>
-    <CodesignProvision>36eb25d6-f482-4e4c-b21b-c6210fa7065c</CodesignProvision>
+    <CodesignProvision>90eaf52f-fe35-4c11-b51b-8cdc6061b35c</CodesignProvision>
     <IpaPackageName>
     </IpaPackageName>
   </PropertyGroup>
